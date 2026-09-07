@@ -1,0 +1,68 @@
+name: 1. Сохранить урок преподавателя (ibarbylev)
+
+# Creates a branch teacher/<UTC timestamp> from the teacher's current master.
+# Run manually from the Actions tab.
+# Full documentation: docs/lesson-archive.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: 'Имя ветки. Шаблон автоматически подставит время UTC'
+        required: true
+        default: 'teacher/YYYY-MM-DD-HHMMSSZ'
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  UPSTREAM_URL: https://github.com/cpython-projects/060326-flask
+  UPSTREAM_BRANCH: main
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout own repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Build branch name
+        id: name
+        env:
+          BRANCH_NAME_INPUT: ${{ inputs.branch_name }}
+        run: |
+          set -euo pipefail
+          NAME="$BRANCH_NAME_INPUT"
+          if [ -z "$NAME" ] || [ "$NAME" = "teacher/YYYY-MM-DD-HHMMSSZ" ]; then
+            NAME="teacher/$(date -u +'%Y-%m-%d-%H%M%SZ')"
+          fi
+          case "$NAME" in
+            teacher/*) BRANCH="$NAME" ;;
+            *) BRANCH="teacher/$NAME" ;;
+          esac
+          git check-ref-format --branch "$BRANCH" >/dev/null
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+      - name: Fetch teacher's repo
+        run: |
+          set -euo pipefail
+          git remote add upstream "$UPSTREAM_URL" 2>/dev/null || \
+            git remote set-url upstream "$UPSTREAM_URL"
+          git fetch upstream "$UPSTREAM_BRANCH"
+      - name: Create or update snapshot branch
+        env:
+          BRANCH: ${{ steps.name.outputs.branch }}
+        run: |
+          set -euo pipefail
+          REMOTE_SHA="$(git ls-remote --heads origin "refs/heads/$BRANCH" | awk 'NR == 1 { print $1 }')"
+          if [ -n "$REMOTE_SHA" ]; then
+            git push --force-with-lease="refs/heads/$BRANCH:$REMOTE_SHA" \
+              origin "upstream/$UPSTREAM_BRANCH:refs/heads/$BRANCH"
+            ACTION="updated"
+          else
+            git push origin "upstream/$UPSTREAM_BRANCH:refs/heads/$BRANCH"
+            ACTION="created"
+          fi
+          echo "### Snapshot $ACTION: \`$BRANCH\`" >> "$GITHUB_STEP_SUMMARY"
