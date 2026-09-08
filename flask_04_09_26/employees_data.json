@@ -1,0 +1,15 @@
+[
+    {
+        "id": "1f29d3da-e80f-456c-8dc3-26a035cc8fc1",
+        "first_name": "Elena",
+        "last_name": "Petrova",
+        "email": "elena.petrova@company.com",
+        "hire_date": "2012-06-01",
+        "salary": 80000.0,
+        "address": {
+            "city": "Antalya",
+            "street": "Ataturk Ave",
+            "house_number": "45B"
+        }
+    }
+]

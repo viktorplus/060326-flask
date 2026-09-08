@@ -1,8 +1,16 @@
+import os
+
 from flask import Flask, Response, request
 from pydantic import ValidationError
-
+from dotenv import load_dotenv
 from .schemas import Employee, EmployeeListAdapter, ErrorResponse
 from .utils import load_employees, save_employees
+
+load_dotenv()
+
+DB_USERNAME = os.environ.get("DB_USERNAME")
+
+
 
 app = Flask(__name__)
 
