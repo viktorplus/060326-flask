@@ -9,8 +9,8 @@ from .utils import load_employees, save_employees
 load_dotenv()
 
 DB_USERNAME = os.environ.get("DB_USERNAME")
-
-
+DRIVER = os.environ.get("DRIVER")
+conn_str = f'{DRIVER}'
 
 app = Flask(__name__)
 
