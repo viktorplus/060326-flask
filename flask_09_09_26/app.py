@@ -1,7 +1,10 @@
 from typing import Optional
 import random
 
-from sqlalchemy import create_engine, Integer, String, ForeignKey, select
+from sqlalchemy import create_engine, Integer, String, ForeignKey
+from sqlalchemy import select
+from sqlalchemy import and_, or_, not_, desc
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -82,30 +85,94 @@ Session = sessionmaker(bind=engine)
 #     session.add_all(users)
 #     session.commit()
 
+# with Session() as session:
+#     user = session.get(User, 1)
+#     print(user)
+#
+#
+#     # stmt = select(User)
+#     # print(stmt)
+#     # print(type(stmt))
+#     #
+#     # result = session.scalars(stmt)
+#     # print(result)
+#     # print(type(result))
+#     #
+#     # result = list(session.scalars(stmt))
+#     # print(result)
+#     # print(type(result))
+#
+#     for user in session.scalars(select(User)):
+#         print(user)
+#
+#     user = session.get(User, 1)
+#     user.age = 135
+#
+#     session.commit()
+
+
+
 with Session() as session:
-    user = session.get(User, 1)
-    print(user)
-
-
-    # stmt = select(User)
-    # print(stmt)
-    # print(type(stmt))
-    #
+    stmt = select(User)
+    # result = session.scalars(stmt).all()
     # result = session.scalars(stmt)
-    # print(result)
-    # print(type(result))
-    #
-    # result = list(session.scalars(stmt))
-    # print(result)
-    # print(type(result))
+    # result = session.execute(stmt).all()
 
-    for user in session.scalars(select(User)):
-        print(user)
+    user_first = session.scalars(stmt).first()
+    print(user_first, user_first.id, user_first.username, user_first.age)
 
-    user = session.get(User, 1)
-    user.age = 135
+    user_one = session.scalars(stmt.where(User.id==1)).one()
+    print(user_one, user_one.id, user_one.username, user_one.age)
 
-    session.commit()
+    user_one_get = session.get(User, 100000)
+    print(user_one_get)
+
+    user_one = session.scalars(stmt.where(User.id == 1)).one_or_none()
+    if user_one:
+        print(user_one, user_one.id, user_one.username, user_one.age)
+
+    query = select(User).where(User.age > 40).where(User.age < 50)
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+    print('*' * 20)
+    query = select(User).where(User.username.ilike('U%'))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).where(User.id.between(2, 4))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    names = ['username6132', 'username9452', 'username4585']
+
+    query = select(User).where(User.username.in_(names))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).where(or_(User.username.ilike('U%'), User.username.ilike('A%')))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).where(or_(User.age < 20, User.age > 50))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).where(not_(User.age > 40))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).order_by(User.age)
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).order_by(desc(User.age))
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
+    query = select(User).order_by(desc(User.age), User.username)
+    users_adult = session.scalars(query).all()
+    print(users_adult)
+
 
 
 
