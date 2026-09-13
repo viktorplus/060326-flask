@@ -1,68 +1,116 @@
+# Имя workflow — именно оно отображается в списке на вкладке Actions.
 name: 1. Сохранить урок преподавателя (ibarbylev)
 
 # Creates a branch teacher/<UTC timestamp> from the teacher's current master.
 # Run manually from the Actions tab.
 # Full documentation: docs/lesson-archive.md
 
+# Блок on описывает, ЧТО запускает workflow.
 on:
+  # workflow_dispatch = запуск только вручную (кнопка "Run workflow"), без реакции на push/PR.
   workflow_dispatch:
+    # Поля формы, которые GitHub покажет при ручном запуске.
     inputs:
       branch_name:
+        # Подпись поля в форме.
         description: 'Имя ветки. Шаблон автоматически подставит время UTC'
+        # Поле обязательно к заполнению.
         required: true
+        # Значение-заглушка: если его не менять, шаг ниже подставит реальную метку времени.
         default: 'teacher/YYYY-MM-DD-HHMMSSZ'
         type: string
 
+# Права токена GITHUB_TOKEN для этого запуска.
 permissions:
+  # contents: write нужен, чтобы шаги ниже могли делать git push в этот же репозиторий.
+  # По принципу наименьших привилегий остальные права остаются read/none.
   contents: write
 
+# Переменные окружения, доступные во всех шагах всех задач этого workflow.
 env:
+  # Репозиторий преподавателя — источник, откуда копируется код урока.
   UPSTREAM_URL: https://github.com/cpython-projects/060326-flask
+  # Ветка в репозитории преподавателя, снимок которой сохраняем.
   UPSTREAM_BRANCH: main
 
+# Список задач. Задачи выполняются параллельно; здесь она одна.
 jobs:
+  # snapshot — внутренний идентификатор задачи.
   snapshot:
+    # Виртуальная машина, на которой выполняются шаги.
     runs-on: ubuntu-latest
+    # Шаги выполняются последовательно; падение любого шага останавливает задачу.
     steps:
       - name: Checkout own repo
+        # Готовое действие из Marketplace: клонирует текущий репозиторий в рабочий каталог.
         uses: actions/checkout@v5
         with:
+          # fetch-depth: 0 — полная история вместо быстрого поверхностного клона.
+          # Без неё git не сможет корректно работать с чужими ветками и push по SHA.
           fetch-depth: 0
 
       - name: Build branch name
+        # id позволяет обращаться к выводам этого шага как steps.name.outputs.<key>.
         id: name
         env:
+          # Значение из формы прокидываем через переменную окружения, а не подставляем
+          # ${{ ... }} прямо в текст скрипта — это защита от инъекции команд в shell.
           BRANCH_NAME_INPUT: ${{ inputs.branch_name }}
+        # "|" — многострочный блок; строки выполняются как bash-скрипт.
         run: |
+          # -e: выход при первой ошибке; -u: ошибка при использовании необъявленной переменной;
+          # -o pipefail: код возврата конвейера = код первой упавшей команды.
           set -euo pipefail
+          # Забираем то, что ввёл пользователь.
           NAME="$BRANCH_NAME_INPUT"
+          # Если поле пустое или в нём остался шаблон по умолчанию —
+          # генерируем имя из текущего времени UTC (date -u).
           if [ -z "$NAME" ] || [ "$NAME" = "teacher/YYYY-MM-DD-HHMMSSZ" ]; then
             NAME="teacher/$(date -u +'%Y-%m-%d-%H%M%SZ')"
           fi
+          # Гарантируем префикс teacher/: если пользователь его не указал — добавляем.
           case "$NAME" in
             teacher/*) BRANCH="$NAME" ;;
             *) BRANCH="teacher/$NAME" ;;
           esac
+          # Проверка, что получившаяся строка вообще допустима как имя git-ветки.
+          # Команда завершится с ошибкой (и остановит шаг из-за set -e), если имя кривое.
           git check-ref-format --branch "$BRANCH" >/dev/null
+          # Передаём результат следующим шагам через специальный файл $GITHUB_OUTPUT.
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
       - name: Fetch teacher's repo
         run: |
           set -euo pipefail
+          # Добавляем remote 'upstream'. Если он уже есть, git remote add упадёт —
+          # тогда по "||" срабатывает запасная ветка и URL просто перезаписывается.
+          # 2>/dev/null глушит ожидаемое сообщение об ошибке, чтобы не пугать в логе.
           git remote add upstream "$UPSTREAM_URL" 2>/dev/null || \
             git remote set-url upstream "$UPSTREAM_URL"
+          # Скачиваем нужную ветку преподавателя; локальные ветки при этом не меняются.
           git fetch upstream "$UPSTREAM_BRANCH"
       - name: Create or update snapshot branch
         env:
+          # Читаем имя ветки, вычисленное шагом с id: name.
           BRANCH: ${{ steps.name.outputs.branch }}
         run: |
           set -euo pipefail
+          # Узнаём, существует ли такая ветка в origin, и берём её текущий SHA.
+          # awk 'NR == 1 {print $1}' — первая колонка первой строки вывода ls-remote.
+          # Если ветки нет, вывод пустой и REMOTE_SHA останется пустой строкой.
           REMOTE_SHA="$(git ls-remote --heads origin "refs/heads/$BRANCH" | awk 'NR == 1 { print $1 }')"
+          # -n "..." = «строка непустая», то есть ветка уже существует.
           if [ -n "$REMOTE_SHA" ]; then
+            # Перезаписываем существующую ветку. --force-with-lease безопаснее --force:
+            # push пройдёт, только если ветка на сервере всё ещё на ожидаемом SHA,
+            # то есть её никто не изменил между ls-remote и push.
             git push --force-with-lease="refs/heads/$BRANCH:$REMOTE_SHA" \
               origin "upstream/$UPSTREAM_BRANCH:refs/heads/$BRANCH"
             ACTION="updated"
           else
+            # Ветки нет — обычный push создаёт её из состояния ветки преподавателя.
             git push origin "upstream/$UPSTREAM_BRANCH:refs/heads/$BRANCH"
             ACTION="created"
           fi
+          # Пишем итог в сводку запуска — она видна на странице Actions над логами.
+          # Обратные слеши экранируют кавычки Markdown внутри двойных кавычек bash.
           echo "### Snapshot $ACTION: \`$BRANCH\`" >> "$GITHUB_STEP_SUMMARY"
