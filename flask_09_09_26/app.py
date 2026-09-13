@@ -187,6 +187,3 @@ with Session() as session:
 
 
 
-
-
-

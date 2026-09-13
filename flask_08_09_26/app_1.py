@@ -30,7 +30,7 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 
 with Session() as session:
-    new_user = User(id=6, username='admin', age='tyututu20') #!
+    new_user = User(id=6, username='admin', age=20) #!
     session.add(new_user)
     session.commit()
 
