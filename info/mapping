@@ -1,0 +1,52 @@
+## VAR 1 — imperative mapping
+Сначала отдельно описывается таблица, затем обычный класс, после чего они связываются через registry.
+
+## VAR 2 — declarative mapping
+Модель наследуется от `Base`, а таблица и колонки описываются внутри класса. Это основной вариант для проекта курса.
+
+## VAR 3 — automap
+SQLAlchemy считывает метаданные существующей базы и автоматически строит отображенные классы.
+
+************************
+1 При imperative mapping класс и таблица существуют отдельно.
+
+```python
+from sqlalchemy import Column, Integer, String, Table
+from sqlalchemy.orm import registry
+
+mapper_registry = registry()
+
+user_table = Table(
+    "users",
+    mapper_registry.metadata,
+    Column("id", Integer, primary_key=True),
+    Column("username", String(30)),
+    Column("age", Integer),
+)
+
+class User:
+    def __init__(self, username: str, age: int):
+        self.username = username
+        self.age = age
+
+mapper_registry.map_imperatively(User, user_table)
+```
+
+## Последовательность
+
+1. Создать `registry()`.
+2. Описать объект `Table` в `registry.metadata`.
+3. Создать обычный Python-класс.
+4. Связать класс с таблицей через `map_imperatively()`.
+
+## Когда это полезно
+
+- класс уже существует и его нельзя удобно изменить;
+- описание таблиц хранится отдельно;
+- необходимо контролировать mapping независимо от модели;
+- идет интеграция с legacy-кодом.
+
+Это не «неработающий старый синтаксис». SQLAlchemy 2.x поддерживает imperative mapping, хотя declarative mapping обычно проще.
+
+
+***********************

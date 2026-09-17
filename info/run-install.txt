@@ -1,0 +1,37 @@
+# ЗАПУСК FLASK-ПРИЛОЖЕНИЯ:
+# Правило курса: сначала заходим в каталог урока, потом запускаем.
+cd l03_rest_api
+python -m flask --app app run --debug
+
+
+# 1. **Через сам Python-файл, в файле должно быть:
+# if __name__ == "__main__": \ app.run(debug=True)
+python app.py
+# 2. **Через команду `flask`**
+flask --app app.py run
+# С режимом отладки:
+flask --app app.py run --debug
+# 3. **Через Python-модуль Flask**
+python -m flask --app app.py run
+# С режимом отладки:
+python -m flask --app app.py run --debug
+# Если виртуальное окружение активно, я бы рекомендовал **3-й вариант**:
+# Он надежнее, потому что гарантированно используется Flask именно из текущего Python/`.venv`.
+python -m flask --app app.py run --debug
+
+# УСТАНОВКА ЗАВИСИМОСТЕЙ:
+################################################
+ # создать виртуальное окружение
+    python -m venv .venv
+    .venv\Scripts\activate
+
+ # создать файл зависимостей requirements.txt
+    python -m pip freeze > requirements.txt
+
+ # установить зависимости из requirements.txt
+    python -m pip install -r requirements.txt
+
+python -m pip install flask pydantic 'pydantic[email]' SQLAlchemy
+
+# .env файл для хранения переменных окружения
+pip install python-dotenv

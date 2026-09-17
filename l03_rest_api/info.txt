@@ -1,0 +1,153 @@
+Это маленький Flask API для работы с сотрудниками: хранит данные в JSON, валидирует вход через Pydantic и отдаёт JSON-ответы. В этой папке всё организовано как “микросервис”, без БД и шаблонов, только HTTP-эндпоинты.
+Что в папке:
+•
+app.py — главный Flask-приложение и маршруты
+•
+schemas.py — модели данных и валидация
+•
+utils.py — чтение/запись JSON и расчёты стажа/бонуса
+•
+settings.py — путь к файлу данных
+•
+employees_data.json — актуальное хранилище сотрудников
+•
+employee.json, list_employees.json — примеры данных для одиночного и пакетного создания
+•
+init.py — пакетный маркер, чтобы можно было импортировать модуль как пакет
+Как устроен Flask-код в app.py:
+•
+app = Flask(name) создаёт объект приложения.
+•
+@app.route("/employees", methods=["GET", "POST"]) привязывает функцию к URL.
+•
+request — объект запроса Flask. У него есть method, get_json(), args, form и т.д.
+•
+Response(...) — возвращаемый ответ, в JSON-формате.
+•
+mimetype="application/json" говорит клиенту, что это JSON.
+Функция error_response(e: ValidationError, status: int = 400) -> Response
+•
+Принимает объект ValidationError из Pydantic.
+•
+Создаёт ErrorResponse(error="Validation error", details=...).
+•
+e.errors(include_url=False, include_context=False) возвращает список ошибок в читаемом виде.
+•
+Возвращает HTTP-статус 400 по умолчанию.
+•
+Смысл: клиент всегда получает стандартный формат ошибки.
+Функция employees_view()
+•
+Обрабатывает путь /employees для GET и POST.
+•
+Если метод POST:
+◦
+request.get_json(force=True) берёт JSON из тела запроса, даже если Content-Type не указан корректно.
+◦
+Employee(payload) создаёт объект модели.
+◦
+Employee проверяет поля: имя, фамилия, email, дата приёма, зарплата, адрес.
+◦
+Если данные невалидные — ловится ValidationError и идёт в error_response.
+◦
+Затем загружается список сотрудников из файла, новый сотрудник добавляется, и save_employees(...) сохраняет всё обратно.
+◦
+Ответ возвращается со статусом 201 и JSON нового сотрудника.
+•
+Если метод GET:
+◦
+load_employees() читает все записи из файла.
+◦
+Возвращает список в JSON.
+◦
+В JSON появляются вычисляемые поля years_worked и actual_salary, потому что это @computed_field.
+Функция employees_batch_view()
+•
+Обрабатывает /employees/batch только POST.
+•
+EmployeeListAdapter.validate_python(request.get_json(force=True)) валидирует весь список сотрудников.
+•
+Если список невалидный — ошибка в том же формате.
+•
+Затем текущие сотрудники объединяются с новыми и сохраняются.
+•
+Ответ возвращает только добавленные сотрудники со статусом 201.
+if name == "main": app.run(debug=True)
+•
+Запускает локальный dev-сервер Flask.
+•
+debug=True включает режим отладки: перезапуск после изменений и полезные трассировки ошибок.
+Теперь про schemas.py:
+•
+Address(BaseModel) — вложенная структура адреса: город, улица, номер дома.
+•
+Employee(BaseModel) — главное описание сотрудника.
+•
+ConfigDict(str_strip_whitespace=True) убирает лишние пробелы в строках.
+•
+id: UUID = Field(default_factory=uuid4) — id генерируется автоматически при создании объекта.
+•
+@model_validator(mode="after") проверяет, что имя и фамилия не совпадают.
+•
+@computed_field @property years_worked вычисляет стаж через calc_years_worked(...).
+•
+@computed_field @property actual_salary считает зарплату с бонусом:
+◦
+до 3 лет: 0%
+◦
+3–5 лет: 10%
+◦
+5–10 лет: 20%
+◦
+10+ лет: 30%
+•
+ErrorResponse — единый формат ошибок.
+•
+EmployeeListAdapter = TypeAdapter(list[Employee]) нужен, потому что список сам по себе не является BaseModel и у него нет model_validate.
+Про utils.py:
+•
+calc_years_worked(hire_date: date) вычисляет количество лет относительно сегодняшней даты.
+•
+calc_bonus_percent(years: int) возвращает процент надбавки.
+•
+load_employees():
+◦
+читает JSON
+◦
+если файла ещё нет — возвращает пустой список
+◦
+иначе создаёт список объектов Employee из массива данных
+•
+save_employees(employees):
+◦
+формирует data = [e.model_dump(mode="json", exclude={"years_worked", "actual_salary"}) ...]
+◦
+исключает вычисляемые поля, потому что их не нужно хранить в файле
+◦
+записывает JSON с отступами и UTF-8
+Про settings.py:
+•
+DATA_FILE = "employees_data.json" — путь к файлу хранения, относительно каталога запуска.
+•
+Это упрощает отделение конфигурации от логики.
+Что важно понять по архитектуре:
+•
+Flask здесь используется как REST API, а не как MVC-страницы.
+•
+Вся логика хранения — в файле JSON, не в базе.
+•
+Валидация данных — через Pydantic.
+•
+Ответы — строго JSON.
+•
+Все данные проходят через модель Employee, поэтому структура данных стабильна.
+Проверил на практике:
+•
+GET /employees → 200
+•
+POST /employees с корректным JSON → 201
+•
+POST /employees с невалидными данными → 400
+•
+Значения years_worked и actual_salary реально вычисляются и возвращаются.
+Ещё одна важная деталь: в app.py есть переменные DB_USERNAME, DRIVER, conn_str, но они нигде не используются. Это скорее заготовка/остаток предыдущей реализации, а не часть текущей логики API.

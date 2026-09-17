@@ -1,0 +1,26 @@
+вызывается у экземпляра модели, сериализизует модель в словарь или JSON-строку
+model_dump()                    → модель → dict
+model_dump_json(indent=4)       → модель → JSON-строка
+
+вызывается у класса модели, десериализизует словарь или JSON-строку в модель
+model_validate()                → dict → модель
+model_validate_json()           → JSON-строка → модель
+
+*********************
+from flask import Flask, Response, request
+from pydantic import ValidationError
+
+app = Flask(__name__)
+
+@app.post("/users")
+def create_user():
+    try:
+        user = User.model_validate(request.get_json())
+    except ValidationError as error:
+        return Response(error.json(), status=400, mimetype="application/json")
+
+    return Response(
+        user.model_dump_json(indent=4),
+        status=201,
+        mimetype="application/json",
+    )
