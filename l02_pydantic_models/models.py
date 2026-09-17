@@ -168,6 +168,10 @@ if __name__ == '__main__':
 
     try:
         # Разбор строки JSON + валидация одним вызовом.
+        # model_validate_json — метод КЛАССА: вызывается на User, а не на готовом
+        # экземпляре, потому что экземпляра ещё нет — он как раз и создаётся.
+        # За один вызов делает три вещи: разбирает JSON-строку, проверяет данные
+        # по схеме и возвращает экземпляр модели.
         # strict=False разрешает 22.0 -> 22 (float в int) и 0 -> False (int в bool).
         user = User.model_validate_json(json_string, strict=False)
         print(user)
@@ -175,7 +179,11 @@ if __name__ == '__main__':
         # Присваивание без повторной валидации (validate_assignment по умолчанию выключен).
         user.age += 10
 
-        # Обратная сериализация модели в строку JSON с отступами.
+        # Обратная сериализация. model_dump_json — метод ЭКЗЕМПЛЯРА (в отличие от
+        # model_validate_json выше): сериализуется состояние конкретного объекта.
+        #   model_dump()      -> dict Python
+        #   model_dump_json() -> строка JSON
+        # indent=4 — «красивый» человекочитаемый вывод.
         res = user.model_dump_json(indent=4)
         print(res)
     except ValidationError as e:
