@@ -1,4 +1,4 @@
-# flask_09_09_26_practic — схема проекта
+# l06_practice — схема проекта
 
 ## Что это
 
@@ -17,8 +17,8 @@
 ## Точка входа и запуск
 
 ```
-python flask_09_09_26_practic/app.py
-python flask_09_09_26_practic/app2.py
+python l06_practice/app.py
+python l06_practice/app2.py
 ```
 
 `app2.py` создаёт файл `base.db` в текущем рабочем каталоге — точнее, **должен был бы**:

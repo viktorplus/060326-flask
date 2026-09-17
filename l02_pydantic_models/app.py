@@ -10,7 +10,7 @@ from pydantic import ValidationError
 
 # Импорт модели User из соседнего файла models.py.
 # ВАЖНО: импорт абсолютный (не `from .models import`), поэтому запускать нужно
-# из каталога flask_03_09_26, иначе Python не найдёт модуль.
+# из каталога l02_pydantic_models, иначе Python не найдёт модуль.
 # Побочный эффект: код на верхнем уровне models.py выполнится прямо при импорте.
 from models import User
 
@@ -68,7 +68,7 @@ def index():
         return jsonify(e.errors)
 
 
-# Дальше — те же учебные маршруты, что и в flask0/app.py.
+# Дальше — те же учебные маршруты, что и в l01_routing/app.py.
 
 # Статический маршрут.
 @app.route('/menu')

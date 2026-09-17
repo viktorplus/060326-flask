@@ -1,4 +1,4 @@
-# 11_09_26 — схема проекта
+# l08_orm_loading — схема проекта
 
 ## Что это
 
@@ -11,13 +11,14 @@ Flask не используется. Вход — база данных, вых�
 ## Точка входа и запуск
 
 ```
-cd 11_09_26
+cd l08_orm_loading
 python app.py
 ```
 
-Каталог начинается с цифры — `import 11_09_26.app` невозможен, файл запускается напрямую.
+Имя каталога — корректный идентификатор Python, поэтому `import l08_orm_loading.app` возможен,
+но файл рассчитан на прямой запуск.
 `create_engine('sqlite:///db.sqlite', echo=True)` — путь относительный, готовый `db.sqlite`
-лежит внутри `11_09_26/`, поэтому запускать нужно из этого каталога.
+лежит внутри `l08_orm_loading/`, поэтому запускать нужно из этого каталога.
 
 ## Схема
 
@@ -75,7 +76,7 @@ flowchart TB
 | Стратегия | Где в проекте | Сколько запросов на N пользователей | Как выглядит |
 |---|---|---|---|
 | `lazy='select'` (по умолчанию) | — | **1 + N** — проблема N+1 | отдельный SELECT на каждое обращение к `.addresses` |
-| `lazy='joined'` | [`flask_09_09_26`](../flask_09_09_26/SCHEMA.md), [`10_09_26`](../10_09_26/SCHEMA.md) | **1** | один запрос с LEFT OUTER JOIN |
+| `lazy='joined'` | [`l05_orm_relationships`](../l05_orm_relationships/SCHEMA.md), [`l07_orm_aggregates`](../l07_orm_aggregates/SCHEMA.md) | **1** | один запрос с LEFT OUTER JOIN |
 | `lazy='selectin'` | **этот файл** | **2** | SELECT по users + SELECT по addresses с `WHERE user_id IN (...)` |
 
 ## Связи

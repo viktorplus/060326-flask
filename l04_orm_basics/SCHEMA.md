@@ -1,4 +1,4 @@
-# flask_08_09_26 — схема проекта
+# l04_orm_basics — схема проекта
 
 ## Что это
 
@@ -14,13 +14,13 @@
 ## Точка входа и запуск
 
 ```
-python flask_08_09_26/app_1.py
-python flask_08_09_26/app_2.py
+python l04_orm_basics/app_1.py
+python l04_orm_basics/app_2.py
 ```
 
 Строки подключения относительные (`sqlite:///db.sqlite3` и `sqlite:///db.sqlite`), поэтому файл
 БД создаётся **в текущем рабочем каталоге процесса**, а не рядом со скриптом. В самом каталоге
-`flask_08_09_26/` файлов БД нет: `db.sqlite3` к тому же занесён в `.gitignore` (строка 71).
+`l04_orm_basics/` файлов БД нет: `db.sqlite3` к тому же занесён в `.gitignore` (строка 71).
 
 ## Схема
 
@@ -85,7 +85,7 @@ flowchart TB
 * **`add()` не выполняет SQL.** Он лишь помечает объект как новый в сессии; INSERT уходит в базу
   на `commit()`. Без `commit()` выход из блока `with` откатит всё.
 * **Два способа включить SQL-лог эквивалентны**: `logging` с уровнем DEBUG для логгера
-  `sqlalchemy.engine` (как здесь) либо `create_engine(..., echo=True)` (как в `11_09_26/app.py`).
+  `sqlalchemy.engine` (как здесь) либо `create_engine(..., echo=True)` (как в `l08_orm_loading/app.py`).
   Уровень DEBUG показывает и запрос, и его параметры; INFO — только запрос.
 * **VAR 3 (automap) достаёт класс по имени ТАБЛИЦЫ, а не класса**: `Base.classes.users`. Удобно
   для чужой/легаси-базы, но IDE не знает про поля — подсказок типов нет.
@@ -93,4 +93,4 @@ flowchart TB
   `Mapped[int] = mapped_column(...)`. Результат в БД одинаковый, разница только в подсказках
   типов для IDE и mypy.
 * `Address` здесь ещё без `ForeignKey` — внешний ключ и `relationship` появляются в
-  [`flask_09_09_26`](../flask_09_09_26/SCHEMA.md).
+  [`l05_orm_relationships`](../l05_orm_relationships/SCHEMA.md).

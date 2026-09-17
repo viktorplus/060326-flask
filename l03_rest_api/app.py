@@ -1,5 +1,5 @@
 # Урок 04.09.26: мини-REST API «сотрудники» — Flask + Pydantic + хранение в JSON-файле.
-# Запускать как пакет из корня проекта: python -m flask_04_09_26.app
+# Запускать как пакет из корня проекта: python -m l03_rest_api.app
 # (относительные импорты ниже работают только при таком запуске).
 
 # os — доступ к переменным окружения.
@@ -16,7 +16,7 @@ from pydantic import ValidationError
 # Читает файл .env и кладёт его содержимое в переменные окружения процесса.
 from dotenv import load_dotenv
 
-# Относительные импорты внутри пакета (точка = «текущий пакет flask_04_09_26»).
+# Относительные импорты внутри пакета (точка = «текущий пакет l03_rest_api»).
 from .schemas import Employee, EmployeeListAdapter, ErrorResponse
 from .utils import load_employees, save_employees
 

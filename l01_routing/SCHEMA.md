@@ -1,4 +1,4 @@
-# flask0 — схема проекта
+# l01_routing — схема проекта
 
 ## Что это
 
@@ -11,7 +11,7 @@
 ## Точка входа и запуск
 
 ```
-python flask0/app.py
+python l01_routing/app.py
 ```
 
 `app.run()` без аргументов → сервер на `http://127.0.0.1:5000`, `debug` выключен.
@@ -22,7 +22,7 @@ python flask0/app.py
 flowchart LR
     Client["HTTP-клиент<br/>браузер / curl"] -->|"GET /..."| Flask
 
-    subgraph App["flask0/app.py"]
+    subgraph App["l01_routing/app.py"]
         Flask["app = Flask(__name__)<br/>url_map: 5 правил"]
         Flask --> R1["/ → index()"]
         Flask --> R2["/menu → menu()"]
@@ -68,7 +68,7 @@ flowchart LR
   дефолтного `string`.
 * `/menu/abc` даст **404**, а не вызов `dish()`: конвертер `int` просто не совпадает.
 * `/a/b/c` не совпадёт ни с одним правилом — дефолтный конвертер `string` не пропускает `/`.
-* В комментарии в коде упомянут маршрут `/events`, но в `flask0/app.py` его нет — он появляется
-  только в [`flask_03_09_26/app.py`](../flask_03_09_26/SCHEMA.md).
+* В комментарии в коде упомянут маршрут `/events`, но в `l01_routing/app.py` его нет — он появляется
+  только в [`l02_pydantic_models/app.py`](../l02_pydantic_models/SCHEMA.md).
 * `app.run()` поднимает отладочный сервер Werkzeug. Для продакшена нужен WSGI-сервер
   (gunicorn/uwsgi) — встроенный на это не рассчитан.

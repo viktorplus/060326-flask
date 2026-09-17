@@ -1,4 +1,4 @@
-# flask_03_09_26 — схема проекта
+# l02_pydantic_models — схема проекта
 
 ## Что это
 
@@ -12,11 +12,11 @@
 ## Точка входа и запуск
 
 ```
-cd flask_03_09_26
+cd l02_pydantic_models
 python app.py
 ```
 
-Запускать нужно **из каталога `flask_03_09_26`**: в `app.py` стоит абсолютный импорт
+Запускать нужно **из каталога `l02_pydantic_models`**: в `app.py` стоит абсолютный импорт
 `from models import User`, а не `from .models import User`. Из корня проекта модуль `models`
 не найдётся.
 
