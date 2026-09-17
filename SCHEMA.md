@@ -154,11 +154,13 @@ flowchart TB
   с вкладки Actions, создаёт в этом репозитории ветку `teacher/<метка времени UTC>` со снимком
   ветки `main` репозитория преподавателя (`cpython-projects/060326-flask`). К коду уроков
   отношения не имеет — это инструмент архивации.
-* **`.env`** — `DB_USERNAME` и `DRIVER`. Читается только в `l03_rest_api/app.py`.
+* **`.env.example`** — шаблон файла окружения, лежит в репозитории. После клонирования:
+  `cp .env.example .env` (в PowerShell — `Copy-Item .env.example .env`).
+* **`.env`** — `DB_USERNAME` и `DRIVER`, читается только в `l03_rest_api/app.py`.
+  Сам файл в `.gitignore` и в репозиторий не попадает; значения здесь учебные, секретов нет.
   Ключ называется `DB_USERNAME`, а не `USERNAME`, намеренно: `USERNAME` на Windows занят
   системой, а `load_dotenv()` по умолчанию не перезаписывает уже существующие переменные,
-  так что значение из `.env` было бы молча проигнорировано. Файл в `.gitignore` —
-  после клонирования его нужно создать самому (две строки, см. выше).
+  так что значение из `.env` было бы молча проигнорировано.
 * **`info/`** — короткие конспекты по темам курса: `SQLAlchemy.md`, `computed_field.md`,
   `type_adapter.md`, `model_dump__model_validate`, `mapping`, `responce.md`,
   `default_factory.md`, `run-install.txt` (установка зависимостей и способы запуска Flask).
