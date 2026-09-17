@@ -26,7 +26,7 @@ def index():
         "id": 1,
         "name": "John Doe",
         "age": 22.0,
-        "email": "john.doe@example.com",
+        "email": "john.doe@gmail.com",
         "is_active": 0,
         "address": {
             "city": "New York",
@@ -34,6 +34,10 @@ def index():
             "house_number": "123"
         }
     }"""
+
+    # Домен gmail.com выбран не случайно: валидатор check_email в models.py пропускает
+    # только gmail.com и yahoo.com. Подставьте любой другой домен (например example.com) —
+    # и запрос уйдёт в ветку except ниже. Это удобный способ увидеть обе ветки обработчика.
 
     # Заметки с занятия: в нестрогом режиме Pydantic делает «безопасные» приведения типов.
     # bool - int    -> 0/1 превращается в False/True (поле is_active)
@@ -62,10 +66,28 @@ def index():
         return Response(res, mimetype='application/json')
     except ValidationError as e:
         # Если данные не прошли валидацию — отдаём описание ошибок.
-        # ОСТОРОЖНО (учебный баг): e.errors — это МЕТОД, а не свойство.
-        # Без скобок сюда попадёт сам объект метода, и jsonify упадёт.
-        # Правильно: jsonify(e.errors())
-        return jsonify(e.errors)
+
+        # Здесь две ЧАСТЫЕ ОШИБКИ подряд, обе дают 500 и обе всплывают только
+        # тогда, когда валидация РЕАЛЬНО не прошла — на успешном запросе их не видно.
+
+        # Ошибка 1. errors — это МЕТОД, а не свойство. Без скобок в jsonify попадёт
+        # сам объект метода: "TypeError: Object of type builtin_function_or_method
+        # is not JSON serializable". Так НЕ надо:
+        # return jsonify(e.errors)
+
+        # Ошибка 2. Вызвать метод — мало. По умолчанию errors() кладёт в каждый
+        # элемент ключ 'ctx' с ИСХОДНЫМ исключением валидатора (у нас — ValueError
+        # из check_email), а объект исключения в JSON не сериализуется:
+        # "TypeError: Object of type ValueError is not JSON serializable". Так тоже НЕ надо:
+        # return jsonify(e.errors())
+
+        # Правильно: выключить несериализуемый контекст (и заодно ссылку на доки —
+        # в теле ответа она не нужна). Тот же приём применён в l03_rest_api/app.py.
+        #
+        # Вторым элементом кортежа возвращаем код ответа. Без него Flask отдаст 200,
+        # то есть «всё хорошо» — на ошибку валидации это неверно: клиент не сможет
+        # отличить успех от отказа, не разбирая тело. 400 Bad Request — «данные кривые».
+        return jsonify(e.errors(include_url=False, include_context=False)), 400
 
 
 # Дальше — те же учебные маршруты, что и в l01_routing/app.py.

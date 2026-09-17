@@ -3,10 +3,7 @@
 
 from sqlalchemy import create_engine, Integer, String, ForeignKey
 
-# label — присвоить вычисляемой колонке имя (AS ...); в этом файле импортирован, но не используется.
-from sqlalchemy import select, label
-
-from sqlalchemy import and_, or_, not_, desc
+from sqlalchemy import select
 
 # func — «мост» к SQL-функциям: func.avg(...), func.count(...), func.max(...).
 from sqlalchemy import func

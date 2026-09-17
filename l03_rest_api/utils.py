@@ -7,7 +7,7 @@ import json
 from datetime import date
 
 # Путь к файлу-хранилищу вынесен в settings.py, чтобы не хардкодить его здесь.
-from .settings import DATA_FILE
+from settings import DATA_FILE
 
 
 # Полное число отработанных лет на сегодняшний день.
@@ -40,7 +40,7 @@ def calc_bonus_percent(years: int) -> float:
 def load_employees() -> list:
     # Импорт ВНУТРИ функции, а не наверху файла, — чтобы разорвать циклический импорт:
     # schemas.py импортирует utils.py, а utils.py нуждается в schemas.Employee.
-    from .schemas import Employee
+    from schemas import Employee
     try:
         # encoding="utf-8" обязателен на Windows: иначе кодировка по умолчанию
         # (cp1251) сломает кириллицу в данных.

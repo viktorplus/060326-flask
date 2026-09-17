@@ -1,8 +1,9 @@
 # Урок 11.09.26: стратегии загрузки связей (lazy), HAVING, подзапросы и JOIN.
 # Главная тема — проблема N+1 запросов и способы её избежать.
 
-from sqlalchemy import create_engine, select, func, desc, ForeignKey, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker, aliased
+# func нужен блоку с агрегатами и HAVING (ниже, в закомментированной части урока).
+from sqlalchemy import create_engine, select, func, ForeignKey, String
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
 
 # Базовый класс моделей.

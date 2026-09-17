@@ -13,14 +13,15 @@ from sqlalchemy import create_engine, Integer, String, ForeignKey
 # select — конструктор SELECT-запроса (стиль SQLAlchemy 2.0, вместо старого session.query()).
 from sqlalchemy import select
 
-# Логические операторы для WHERE: И / ИЛИ / НЕ и сортировка по убыванию.
-from sqlalchemy import and_, or_, not_, desc
-
-# func — доступ к SQL-функциям (count, avg, min, max...). В этом файле не используется.
-from sqlalchemy import func
+# Логические операторы для WHERE: ИЛИ / НЕ и сортировка по убыванию.
+# and_ не импортируем: два .where() подряд и так склеиваются через AND (см. ниже).
+from sqlalchemy import or_, not_, desc
 
 # relationship — связь на уровне ORM (питоновские атрибуты-объекты, а не колонки).
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
+
+# NoResultFound — исключение, которым .one() сообщает, что строк не нашлось.
+from sqlalchemy.exc import NoResultFound
 
 
 # Общий базовый класс моделей.
@@ -175,15 +176,30 @@ with Session() as session:
     # result = session.execute(stmt).all()    # список КОРТЕЖЕЙ (Row), а не объектов
 
     # .first() — первая строка или None, если результат пуст.
-    # ВНИМАНИЕ: если таблица пуста, обращение к user_first.id упадёт с AttributeError.
+    # ЧАСТАЯ ОШИБКА: сразу обратиться к полю результата.
+    # На наполненной базе это работает и выглядит правильно, но стоит таблице
+    # оказаться пустой — и .first() вернёт None, а следующая строка упадёт с
+    # "AttributeError: 'NoneType' object has no attribute 'id'". Так НЕ надо:
+    # user_first = session.scalars(stmt).first()
+    # print(user_first, user_first.id, user_first.username, user_first.age)
+
+    # Правильно: результат .first() всегда проверяем перед использованием.
     user_first = session.scalars(stmt).first()
-    print(user_first, user_first.id, user_first.username, user_first.age)
+    if user_first:
+        print(user_first, user_first.id, user_first.username, user_first.age)
+    else:
+        print('Таблица users пуста')
 
     # .where(...) возвращает НОВЫЙ объект запроса, исходный stmt не меняется.
     # == внутри where — это не сравнение Python, а построение SQL-условия "id = 1".
     # .one() требует ровно одну строку: 0 строк -> NoResultFound, 2+ -> MultipleResultsFound.
-    user_one = session.scalars(stmt.where(User.id==1)).one()
-    print(user_one, user_one.id, user_one.username, user_one.age)
+    # В отличие от .first() он не возвращает None, а бросает исключение, поэтому
+    # проверкой на None тут не обойтись — нужен try/except.
+    try:
+        user_one = session.scalars(stmt.where(User.id == 1)).one()
+        print(user_one, user_one.id, user_one.username, user_one.age)
+    except NoResultFound:
+        print('Пользователь с id=1 не найден')
 
     # session.get ищет по первичному ключу и возвращает None, если записи нет
     # (исключение не бросается — в отличие от .one()).

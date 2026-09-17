@@ -7,16 +7,25 @@
 
 Подробная схема каждого проекта лежит рядом с его кодом, в файле `SCHEMA.md`.
 
+**Единое правило запуска: из каталога проекта.** Заходим в папку урока и запускаем файл —
+никаких `python -m пакет.модуль` из корня. Все относительные пути (`db.sqlite`,
+`employees_data.json`) разрешаются от текущего каталога, поэтому так они всегда попадают
+рядом с кодом урока.
+
+Учебные ошибки в коде **сохранены намеренно**: неправильный вариант оставлен рядом
+закомментированным, с пометкой «так НЕ надо» и разбором последствий, а рабочей строкой
+идёт правильная. Искать глазами сломанный код не нужно — всё запускается.
+
 ## Индекс
 
 | Каталог | Тема занятия | Стек | Тип | Точка входа | Схема |
 |---|---|---|---|---|---|
-| `l01_routing` | маршрутизация, конвертеры путей | Flask | веб-сервер | `python l01_routing/app.py` | [SCHEMA](l01_routing/SCHEMA.md) |
+| `l01_routing` | маршрутизация, конвертеры путей | Flask | веб-сервер | `cd l01_routing && python app.py` | [SCHEMA](l01_routing/SCHEMA.md) |
 | `l02_pydantic_models` | Pydantic: модели, валидаторы, `Response` | Flask + Pydantic | веб-сервер | `cd l02_pydantic_models && python app.py` | [SCHEMA](l02_pydantic_models/SCHEMA.md) |
-| `l03_rest_api` | REST API «сотрудники», слои, хранение в JSON | Flask + Pydantic + dotenv | **REST API** | `python -m l03_rest_api.app` | [SCHEMA](l03_rest_api/SCHEMA.md) |
-| `l04_orm_basics` | первые модели ORM, 3 способа маппинга | SQLAlchemy | скрипт | `python l04_orm_basics/app_1.py` (и `app_2.py`) | [SCHEMA](l04_orm_basics/SCHEMA.md) |
+| `l03_rest_api` | REST API «сотрудники», слои, хранение в JSON | Flask + Pydantic + dotenv | **REST API** | `cd l03_rest_api && python app.py` | [SCHEMA](l03_rest_api/SCHEMA.md) |
+| `l04_orm_basics` | первые модели ORM, 3 способа маппинга | SQLAlchemy | скрипт | `cd l04_orm_basics && python app_1.py` (и `app_2.py`) | [SCHEMA](l04_orm_basics/SCHEMA.md) |
 | `l05_orm_relationships` | `relationship` 1:M, фильтры `WHERE` | SQLAlchemy | скрипт | `cd l05_orm_relationships && python app.py` | [SCHEMA](l05_orm_relationships/SCHEMA.md) |
-| `l06_practice` | практика: 4 задания Pydantic + 2 SQLAlchemy | Pydantic, SQLAlchemy | скрипт | `python l06_practice/app.py` (и `app2.py`) | [SCHEMA](l06_practice/SCHEMA.md) |
+| `l06_practice` | практика: 4 задания Pydantic + 2 SQLAlchemy | Pydantic, SQLAlchemy | скрипт | `cd l06_practice && python app.py` (и `app2.py`) | [SCHEMA](l06_practice/SCHEMA.md) |
 | `l07_orm_aggregates` | агрегаты, `GROUP BY`, `aliased` | SQLAlchemy | скрипт | `cd l07_orm_aggregates && python app.py` | [SCHEMA](l07_orm_aggregates/SCHEMA.md) |
 | `l08_orm_loading` | стратегии `lazy`, N+1, `HAVING`, подзапросы | SQLAlchemy | скрипт | `cd l08_orm_loading && python app.py` | [SCHEMA](l08_orm_loading/SCHEMA.md) |
 
@@ -78,7 +87,7 @@ flowchart TB
         B1[("l05_orm_relationships/db.sqlite<br/>users 21 · addresses 0")]
         B2[("l07_orm_aggregates/db.sqlite<br/>users 21 · addresses 0")]
         B3[("l08_orm_loading/db.sqlite<br/>users 15 · addresses 15<br/>другая схема!")]
-        B4["db.sqlite3 / base.db<br/>создаются в рабочем каталоге,<br/>в репозитории их нет"]
+        B4["l04_orm_basics/db.sqlite3<br/>и db.sqlite<br/>создаются при запуске,<br/>в репозитории их нет"]
     end
 
     F04 --> J1
@@ -120,19 +129,24 @@ flowchart TB
 ## Общие грабли: рабочий каталог
 
 Во всех проектах пути относительные, а значит разрешаются от **текущего каталога процесса**,
-а не от расположения файла. Запуск не из того каталога не выдаёт ошибку — он молча создаёт
-пустую базу или пишет JSON не туда.
+а не от расположения файла. Правило поэтому одно для всех восьми: `cd <каталог урока>`,
+затем `python <файл>`.
 
-| Проект | Откуда запускать | Почему |
-|---|---|---|
-| `l02_pydantic_models` | из каталога проекта | абсолютный импорт `from models import User` |
-| `l03_rest_api` | из корня репозитория | относительные импорты пакета + `DATA_FILE = "l03_rest_api/..."` |
-| `l05_orm_relationships`, `l07_orm_aggregates`, `l08_orm_loading` | из каталога проекта | готовый `db.sqlite` лежит внутри каталога |
-| `l01_routing`, `l04_orm_basics`, `l06_practice` | откуда угодно | файлов данных не читают (БД создадут в текущем каталоге) |
+Запуск из другого каталога ошибки не даёт — и это самое неприятное. Скрипт молча создаст
+пустую базу или напишет JSON не туда, а вы будете смотреть на пустую выборку и искать
+ошибку в запросе.
 
-Имена всех каталогов — корректные идентификаторы Python, поэтому импорт вида
-`import l07_orm_aggregates.app` работает для любого из них. Это, однако, не отменяет требований
-к рабочему каталогу из таблицы выше: пути к `db.sqlite` и к JSON остаются относительными.
+| Проект | Что сломается при запуске из корня |
+|---|---|
+| `l02_pydantic_models` | `from models import User` — ModuleNotFoundError |
+| `l03_rest_api` | `from schemas import ...` — ModuleNotFoundError; `employees_data.json` создастся в корне |
+| `l05_orm_relationships`, `l07_orm_aggregates`, `l08_orm_loading` | подключится пустая новая `db.sqlite` в корне вместо готовой, все выборки вернут пусто |
+| `l04_orm_basics` | `db.sqlite3` и `db.sqlite` появятся в корне репозитория |
+| `l01_routing`, `l06_practice` | ничего — файлов данных они не читают, но правило всё равно общее |
+
+Имена всех каталогов — корректные идентификаторы Python, так что технически импорт вида
+`import l07_orm_aggregates.app` возможен. Практического смысла в этом нет: модули каждого
+урока рассчитаны на запуск изнутри своего каталога.
 
 ## Что ещё есть в репозитории
 
@@ -140,8 +154,14 @@ flowchart TB
   с вкладки Actions, создаёт в этом репозитории ветку `teacher/<метка времени UTC>` со снимком
   ветки `main` репозитория преподавателя (`cpython-projects/060326-flask`). К коду уроков
   отношения не имеет — это инструмент архивации.
-* **`.env`** — `USERNAME` и `DRIVER`. Читается только в `l03_rest_api/app.py`, причём под
-  другим именем (`DB_USERNAME`), то есть сейчас туда приходит `None`.
+* **`.env`** — `DB_USERNAME` и `DRIVER`. Читается только в `l03_rest_api/app.py`.
+  Ключ называется `DB_USERNAME`, а не `USERNAME`, намеренно: `USERNAME` на Windows занят
+  системой, а `load_dotenv()` по умолчанию не перезаписывает уже существующие переменные,
+  так что значение из `.env` было бы молча проигнорировано. Файл в `.gitignore` —
+  после клонирования его нужно создать самому (две строки, см. выше).
+* **`info/`** — короткие конспекты по темам курса: `SQLAlchemy.md`, `computed_field.md`,
+  `type_adapter.md`, `model_dump__model_validate`, `mapping`, `responce.md`,
+  `default_factory.md`, `run-install.txt` (установка зависимостей и способы запуска Flask).
 * **`.idea/`** — настройки PyCharm, в том числе подключённые источники данных.
 
 ## Как смотреть эти схемы

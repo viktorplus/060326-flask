@@ -11,10 +11,6 @@ from pydantic import BaseModel, field_validator, Field, EmailStr, ConfigDict
 # datetime — дата+время; timedelta — интервал (для сдвига «на 30 дней вперёд»).
 from datetime import datetime, timedelta
 
-# Импорт из SQLAlchemy сделан «на будущее» (в комментарии у поля amount упомянут Decimal),
-# в коде ниже DECIMAL не используется — этот импорт лишний.
-from sqlalchemy import DECIMAL
-
 
 class Event(BaseModel):
     """Задание 1
@@ -36,9 +32,16 @@ class Event(BaseModel):
     # но явное указание даёт корректные подсказки типов в IDE.
     @classmethod
     def check_date(cls, value):
-        # Сравниваем с текущим моментом. Тонкость: datetime.now() — «наивное» время
-        # без часового пояса, поэтому сравнение с aware-датой вызвало бы TypeError.
-        if value < datetime.now():
+        # ЧАСТАЯ ОШИБКА: сравнить пришедшую дату с голым datetime.now().
+        # now() без аргумента возвращает «наивное» время (без часового пояса), и если
+        # клиент пришлёт дату с поясом ("2026-10-01T12:00:00+02:00"), сравнение упадёт с
+        # "TypeError: can't compare offset-naive and offset-aware datetimes". Так НЕ надо:
+        # if value < datetime.now():
+
+        # Правильно: берём «сейчас» в том же поясе, что и у пришедшего значения.
+        # Если пояса нет — now() тоже будет наивным, и типы совпадут.
+        now = datetime.now(value.tzinfo) if value.tzinfo else datetime.now()
+        if value < now:
             # ValueError внутри валидатора Pydantic сам обернёт в ValidationError.
             raise ValueError("Дата события не может быть в прошлом.")
         # Валидатор обязан вернуть значение — иначе в поле окажется None.
@@ -126,21 +129,41 @@ class Appointment(BaseModel):
     patient_name: str
     doctor_name: str
 
-# ВНИМАНИЕ (незакрытое задание): валидатор ниже объявлен на уровне МОДУЛЯ,
-# а не внутри класса Appointment — обратите внимание на отступ.
-# Pydantic собирает валидаторы только из тела класса, поэтому эта проверка
-# никогда не выполняется и модель принимает любую дату.
-# Чтобы задание заработало, декоратор и функцию нужно сдвинуть на один уровень
-# отступа внутрь класса Appointment.
-@field_validator('appointment_date')
+    # ЧАСТАЯ ОШИБКА, из-за отступа. Раньше этот валидатор стоял на уровне МОДУЛЯ,
+    # то есть вне тела класса. Pydantic собирает валидаторы только из тела класса,
+    # поэтому проверка просто никогда не вызывалась: модель молча принимала любую
+    # дату, в том числе прошедшую. Ни ошибки, ни предупреждения — самый неприятный
+    # вид бага. Достаточно было сдвинуть декоратор и функцию на один уровень вправо.
+    @field_validator('appointment_date')
+    @classmethod
+    def check_appointment_date(cls, value: datetime):
+        # Тот же приём с часовым поясом, что и в задании 1.
+        now = datetime.now(value.tzinfo) if value.tzinfo else datetime.now()
 
-def appointment_date_validator(cls, value: datetime):
-    # Если пришла дата с часовым поясом (tzinfo), берём «сейчас» в том же поясе,
-    # иначе — наивное локальное время. Так избегаем TypeError при сравнении.
-    now = datetime.now(value.tzinfo) if value.tzinfo else datetime.now()
+        if value < now:
+            raise ValueError('Дата и время приема должны быть в будущем')
 
-    # Условие строже, чем в задании: запись должна быть минимум за 24 часа.
-    min_allowed = now + timedelta(hours=24)
+        # ВТОРАЯ ЧАСТАЯ ОШИБКА: забыть вернуть значение. Валидатор обязан отдать
+        # value обратно — иначе Pydantic запишет в поле None, и модель «пройдёт»
+        # проверку с пустой датой.
+        return value
 
-    if value < min_allowed:
-        raise ValueError('Дата и время приема должны быть в будущем')
+
+# Проверка задания 4: дата в прошлом должна быть отвергнута.
+try:
+    past_appointment = Appointment(
+        appointment_date=datetime.now() - timedelta(days=1),
+        patient_name='Ivan Petrov',
+        doctor_name='Dr. House',
+    )
+    print(past_appointment)
+except ValueError as e:
+    print(f'ValidationError (ожидаемо, дата в прошлом): {e.errors()[0]["msg"]}')
+
+# Проверка задания 4: корректная дата в будущем должна пройти и сохраниться.
+future_appointment = Appointment(
+    appointment_date=datetime.now() + timedelta(days=3),
+    patient_name='Ivan Petrov',
+    doctor_name='Dr. House',
+)
+print(future_appointment)

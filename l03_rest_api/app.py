@@ -1,6 +1,8 @@
 # Урок 04.09.26: мини-REST API «сотрудники» — Flask + Pydantic + хранение в JSON-файле.
-# Запускать как пакет из корня проекта: python -m l03_rest_api.app
-# (относительные импорты ниже работают только при таком запуске).
+# Запускать ИЗ КАТАЛОГА ПРОЕКТА, как и остальные уроки:
+#     cd l03_rest_api
+#     python app.py
+# (или python -m flask --app app run --debug)
 
 # os — доступ к переменным окружения.
 import os
@@ -16,14 +18,26 @@ from pydantic import ValidationError
 # Читает файл .env и кладёт его содержимое в переменные окружения процесса.
 from dotenv import load_dotenv
 
-# Относительные импорты внутри пакета (точка = «текущий пакет l03_rest_api»).
-from .schemas import Employee, EmployeeListAdapter, ErrorResponse
-from .utils import load_employees, save_employees
+# Импорты соседних модулей — абсолютные, без ведущей точки.
+# Работают потому, что Python кладёт каталог запускаемого скрипта в sys.path:
+# запустили app.py из этого каталога — рядом лежащие schemas/utils/settings видны.
+# Относительный вариант (from .schemas import ...) потребовал бы запуска пакетом
+# из корня репозитория и тем самым выбивался бы из общего правила курса.
+from schemas import Employee, EmployeeListAdapter, ErrorResponse
+from utils import load_employees, save_employees
 
 # Выполняем загрузку .env ДО чтения переменных ниже, иначе они окажутся None.
 load_dotenv()
 
 # Секреты берём только из окружения и никогда не хардкодим в исходнике.
+#
+# ГРАБЛИ, на которые здесь легко наступить. Ключ в .env называется именно
+# DB_USERNAME, а не USERNAME. Причина: USERNAME на Windows уже занят системой —
+# там лежит имя текущего пользователя ОС. А load_dotenv() по умолчанию НЕ
+# перезаписывает уже существующие переменные окружения (override=False), поэтому
+# значение из .env было бы молча проигнорировано, и в переменную попало бы имя
+# пользователя Windows. Ошибки при этом никакой: код «работает», просто не с тем
+# значением. Отсюда правило — давать ключам в .env префикс проекта или подсистемы.
 DB_USERNAME = os.environ.get("DB_USERNAME")
 DRIVER = os.environ.get("DRIVER")
 

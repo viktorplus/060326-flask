@@ -1,8 +1,7 @@
 # Урок 03.09.26: модели Pydantic v2 — типы, Field, ConfigDict, валидаторы, наследование.
 
 # Annotated — способ «приклеить» метаданные к типу: Annotated[тип, метаданные].
-# List — устаревший аналог встроенного list[...] (оставлен из импорта, ниже не используется).
-from typing import Annotated, List
+from typing import Annotated
 
 # BaseModel      — базовый класс всех моделей.
 # EmailStr       — тип-валидатор корректного email (требует пакет email-validator).
@@ -130,49 +129,56 @@ class Admin(User):
     is_admin: bool = True
 
 
-# --- Создание объектов "вручную", через именованные аргументы ---
+# Демонстрационный код ниже закрыт защитой __name__ == '__main__'.
+# ЗАЧЕМ. app.py делает `from models import User`, а импорт выполняет модуль целиком.
+# Без этой защиты примеры отрабатывали бы при каждом старте сервера и печатали
+# в консоль лишнее, в том числе пойманную ValidationError — легко принять за сбой
+# приложения. Правило общее: в модуле с моделями кода верхнего уровня быть не должно.
+# Запустить примеры отдельно: python models.py
+if __name__ == '__main__':
+    # --- Создание объектов "вручную", через именованные аргументы ---
 
-# Вложенный объект создаём отдельно и передаём его как готовый экземпляр.
-# 'NY' короче str_min_length=3? Нет — ровно 2 символа, но ограничение задано
-# в User.model_config и на модель Address не распространяется.
-addr_1 = Address(city='NY', street='San Francisco', house_number='10')
+    # Вложенный объект создаём отдельно и передаём его как готовый экземпляр.
+    # 'NY' короче str_min_length=3? Нет — ровно 2 символа, но ограничение задано
+    # в User.model_config и на модель Address не распространяется.
+    addr_1 = Address(city='NY', street='San Francisco', house_number='10')
 
-# Пробелы вокруг 'John' срежет str_strip_whitespace, а str_to_upper сделает 'JOHN'.
-user_1 = User(id=1, name='     John    ', age=20, is_active=True, address=addr_1, email='example@gmail.com')
+    # Пробелы вокруг 'John' срежет str_strip_whitespace, а str_to_upper сделает 'JOHN'.
+    user_1 = User(id=1, name='     John    ', age=20, is_active=True, address=addr_1, email='example@gmail.com')
 
-# Благодаря переопределённому __str__ напечатается только имя.
-print(user_1)
+    # Благодаря переопределённому __str__ напечатается только имя.
+    print(user_1)
 
 
-# --- Создание объекта из "внешних" данных, например пришедших по API ---
+    # --- Создание объекта из "внешних" данных, например пришедших по API ---
 
-# Строка JSON — имитация тела запроса.
-json_string = """{
-    "id": 1,
-    "name": "John Doe",
-    "age": 22.0,
-    "email": "john.doe@example.com",
-    "is_active": 0,
-    "address": {
-        "city": "New York",
-        "street": "5th Avenue",
-        "house_number": "123"
-    }
-}"""
+    # Строка JSON — имитация тела запроса.
+    json_string = """{
+        "id": 1,
+        "name": "John Doe",
+        "age": 22.0,
+        "email": "john.doe@example.com",
+        "is_active": 0,
+        "address": {
+            "city": "New York",
+            "street": "5th Avenue",
+            "house_number": "123"
+        }
+    }"""
 
-try:
-    # Разбор строки JSON + валидация одним вызовом.
-    # strict=False разрешает 22.0 -> 22 (float в int) и 0 -> False (int в bool).
-    user = User.model_validate_json(json_string, strict=False)
-    print(user)
+    try:
+        # Разбор строки JSON + валидация одним вызовом.
+        # strict=False разрешает 22.0 -> 22 (float в int) и 0 -> False (int в bool).
+        user = User.model_validate_json(json_string, strict=False)
+        print(user)
 
-    # Присваивание без повторной валидации (validate_assignment по умолчанию выключен).
-    user.age += 10
+        # Присваивание без повторной валидации (validate_assignment по умолчанию выключен).
+        user.age += 10
 
-    # Обратная сериализация модели в строку JSON с отступами.
-    res = user.model_dump_json(indent=4)
-    print(res)
-except ValidationError as e:
-    # Сюда попадём, например, если домен почты не из белого списка
-    # или возраст вышел за границы [18, 70].
-    print(f'ValidationError: {e}')
+        # Обратная сериализация модели в строку JSON с отступами.
+        res = user.model_dump_json(indent=4)
+        print(res)
+    except ValidationError as e:
+        # Сюда попадём, например, если домен почты не из белого списка
+        # или возраст вышел за границы [18, 70].
+        print(f'ValidationError: {e}')

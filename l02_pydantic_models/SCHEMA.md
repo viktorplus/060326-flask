@@ -103,14 +103,30 @@ app.py  ──import──▶  models.py  ──▶  pydantic
 
 ## Особенности и учебные баги
 
-* **`jsonify(e.errors)` в ветке `except`** — `errors` это метод, а не свойство. Без скобок в
-  `jsonify` попадёт сам объект метода и обработчик упадёт с `TypeError`. Правильно:
-  `jsonify(e.errors())`.
-* **Демонстрационный код в `models.py` выполняется при импорте.** Строка `json_string` в
-  `models.py` содержит `john.doe@example.com`, а валидатор `check_email` разрешает только
-  `gmail.com` и `yahoo.com` → при импорте в stdout уйдёт `ValidationError: ...`. На запуск
-  Flask это не влияет (исключение поймано), но сам приём — код верхнего уровня в модуле
-  моделей — в рабочем проекте так делать не стоит.
+* **Ветка `except`: две ошибки подряд, обе исправлены.** Разобраны прямо в коде, неправильные
+  варианты оставлены закомментированными.
+  1. `jsonify(e.errors)` — `errors` это метод, а не свойство. Без скобок в `jsonify` попадёт
+     сам объект метода: `TypeError: Object of type builtin_function_or_method is not JSON
+     serializable`.
+  2. `jsonify(e.errors())` — со скобками, но всё равно 500. По умолчанию `errors()` кладёт в
+     каждый элемент ключ `ctx` с **исходным исключением** валидатора (здесь — `ValueError` из
+     `check_email`), а объект исключения не сериализуется: `TypeError: Object of type
+     ValueError is not JSON serializable`. Именно поэтому в
+     [`l03_rest_api`](../l03_rest_api/SCHEMA.md) стоит `include_context=False`.
+
+  Рабочий вариант: `jsonify(e.errors(include_url=False, include_context=False)), 400`.
+  Код ответа добавлен там же: без него Flask вернул бы `200`, и клиент не отличил бы
+  успех от отказа, не разобрав тело.
+* **Демонстрационный код в `models.py` закрыт защитой `if __name__ == '__main__'`.** Раньше он
+  выполнялся при каждом импорте: `app.py` делает `from models import User`, и при старте сервера
+  в консоль уходил `ValidationError: ...` — легко принять за сбой приложения. Правило общее:
+  в модуле с моделями кода верхнего уровня быть не должно. Примеры никуда не делись,
+  запустить их отдельно: `python models.py`.
+* **Демонстрация в `models.py` намеренно падает.** `json_string` там содержит
+  `john.doe@example.com`, а `check_email` разрешает только `gmail.com` и `yahoo.com` —
+  это и показывает работу валидатора. В `app.py` домен, наоборот, проходящий
+  (`john.doe@gmail.com`), чтобы маршрут `/` отдавал успешный ответ; подставьте любой другой
+  домен — и увидите ветку `except`.
 * **`user.age += 10` не проверяется.** По умолчанию `validate_assignment` выключен, поэтому
   ограничение `le=70` при присваивании не срабатывает, и в ответе может оказаться возраст
   вне заявленного диапазона.
@@ -119,5 +135,5 @@ app.py  ──import──▶  models.py  ──▶  pydantic
   (2 символа) проходит.
 * Закомментированный валидатор `check_name` (требование `istitle()`) несовместим с
   `str_to_upper=True`: `"JOHN".istitle()` → `False`.
-* `List` из `typing` импортирован, но не используется; `ValidationError`/`HttpUrl` в
-  `models.py` нужны только `Product` и блоку демонстрации.
+* `ValidationError`/`HttpUrl` в `models.py` нужны только `Product` и блоку демонстрации.
+  Неиспользуемый `List` из `typing` удалён.

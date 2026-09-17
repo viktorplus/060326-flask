@@ -22,7 +22,7 @@ from pydantic import (
 )
 
 # Чистые функции расчёта вынесены в utils.py, чтобы модель не содержала бизнес-логику.
-from .utils import calc_bonus_percent, calc_years_worked
+from utils import calc_bonus_percent, calc_years_worked
 
 # Вложенная модель адреса — используется как тип поля Employee.address.
 class Address(BaseModel):

@@ -348,3 +348,8 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python,pycharm+all,flask
+### Учебные проекты: базы, создаваемые при запуске ###
+# l04_orm_basics создаёт обе базы сам при первом запуске (app_1.py -> db.sqlite3,
+# app_2.py -> db.sqlite). В репозитории их быть не должно — в отличие от готовых
+# db.sqlite в l05/l07/l08, которые лежат в git специально, с данными для запросов.
+l04_orm_basics/db.sqlite
