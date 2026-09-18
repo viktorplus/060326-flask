@@ -30,7 +30,7 @@ query = select(User).join(Address).distinct()
 ## Где в репозитории
 
 - `l08_orm_loading/app.py:155` — `query = select(User).join(Address).distinct()`
-- `l08_orm_loading/app.py:151` *(в закомментированном учебном блоке)* — `# .distinct() убирает дубликаты: пользователь с двумя адресами иначе вернулся бы дважды.`
+- `l08_orm_loading/app.py:151` *(строка-комментарий)* — `# .distinct() убирает дубликаты: пользователь с двумя адресами иначе вернулся бы дважды.`
 
 ## См. также
 

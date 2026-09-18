@@ -37,10 +37,10 @@ class User(Base):
 
 ## Где в репозитории
 
-- `l04_orm_basics/app_1.py:45` *(в закомментированном учебном блоке)* — `# id = Column(Integer, primary_key=True)`
-- `l04_orm_basics/app_1.py:46` *(в закомментированном учебном блоке)* — `# name = Column(String)`
-- `l04_orm_basics/app_1.py:47` *(в закомментированном учебном блоке)* — `# email = Column(String)`
-- `l04_orm_basics/app_2.py:21` *(в закомментированном учебном блоке)* — `#                    Column('id', Integer, primary_key=True),`
+- `l04_orm_basics/app_1.py:45` *(строка-комментарий)* — `# id = Column(Integer, primary_key=True)`
+- `l04_orm_basics/app_1.py:46` *(строка-комментарий)* — `# name = Column(String)`
+- `l04_orm_basics/app_1.py:47` *(строка-комментарий)* — `# email = Column(String)`
+- `l04_orm_basics/app_2.py:21` *(строка-комментарий)* — `#                    Column('id', Integer, primary_key=True),`
 
 ## См. также
 

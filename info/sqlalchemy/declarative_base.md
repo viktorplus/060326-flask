@@ -35,7 +35,7 @@ class User(Base):
 
 - `l06_practice/app2.py:9` — `from sqlalchemy.orm import sessionmaker, declarative_base, Mapped, mapped_column`
 - `l06_practice/app2.py:44` — `Base = declarative_base()`
-- `l06_practice/app2.py:7` *(в закомментированном учебном блоке)* — `# declarative_base — фабрика базового класса в стиле 1.x`
+- `l06_practice/app2.py:7` *(строка-комментарий)* — `# declarative_base — фабрика базового класса в стиле 1.x`
 
 ## См. также
 

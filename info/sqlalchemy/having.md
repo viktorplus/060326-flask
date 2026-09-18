@@ -44,7 +44,7 @@ query = (select(Address.city, func.count(Address.id).label('cnt'))
 
 ## Где в репозитории
 
-- `l08_orm_loading/app.py:120` *(в закомментированном учебном блоке)* — `#                    .label('addr_count')).group_by(Address.city).having(func.count(Address.id) > 3)`
+- `l08_orm_loading/app.py:120` *(строка-комментарий)* — `#                    .label('addr_count')).group_by(Address.city).having(func.count(Address.id) > 3)`
 
 ## См. также
 

@@ -58,8 +58,8 @@ count, min_age, max_age = session.execute(query).one()
 
 - `l07_orm_aggregates/app.py:79` — `result = session.execute(query).all()`
 - `l07_orm_aggregates/app.py:91` — `result = session.execute(stmt).all()`
-- `l05_orm_relationships/app.py:176` *(в закомментированном учебном блоке)* — `# result = session.execute(stmt).all()    # список КОРТЕЖЕЙ (Row), а не объектов`
-- `l08_orm_loading/app.py:102` *(в закомментированном учебном блоке)* — `#     count_min_max = session.execute(query).one()   # .one() — ровно одна строка`
+- `l05_orm_relationships/app.py:176` *(строка-комментарий)* — `# result = session.execute(stmt).all()    # список КОРТЕЖЕЙ (Row), а не объектов`
+- `l08_orm_loading/app.py:102` *(строка-комментарий)* — `#     count_min_max = session.execute(query).one()   # .one() — ровно одна строка`
 
 ## См. также
 

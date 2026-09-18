@@ -43,8 +43,8 @@ user = User(id=6, username='admin', age=20)
 ## Где в репозитории
 
 - `l04_orm_basics/app_2.py:11` — `from sqlalchemy.ext.automap import automap_base`
-- `l04_orm_basics/app_2.py:10` *(в закомментированном учебном блоке)* — `# automap_base — автоматически строит классы по УЖЕ существующим таблицам в БД.`
-- `l04_orm_basics/app_2.py:66` *(в закомментированном учебном блоке)* — `# Base = automap_base(metadata=metadata)`
+- `l04_orm_basics/app_2.py:10` *(строка-комментарий)* — `# automap_base — автоматически строит классы по УЖЕ существующим таблицам в БД.`
+- `l04_orm_basics/app_2.py:66` *(строка-комментарий)* — `# Base = automap_base(metadata=metadata)`
 
 ## См. также
 

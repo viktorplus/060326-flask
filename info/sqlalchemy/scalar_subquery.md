@@ -43,8 +43,8 @@ query = select(User.username, addr_count.label('addr_count'))
 
 ## Где в репозитории
 
-- `l08_orm_loading/app.py:125` *(в закомментированном учебном блоке)* — `#     # .scalar_subquery() помечает запрос как «возвращает одно значение»,`
-- `l08_orm_loading/app.py:127` *(в закомментированном учебном блоке)* — `#     avg_age_subq = select(func.avg(User.age)).scalar_subquery()`
+- `l08_orm_loading/app.py:125` *(строка-комментарий)* — `#     # .scalar_subquery() помечает запрос как «возвращает одно значение»,`
+- `l08_orm_loading/app.py:127` *(строка-комментарий)* — `#     avg_age_subq = select(func.avg(User.age)).scalar_subquery()`
 
 ## См. также
 

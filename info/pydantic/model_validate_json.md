@@ -56,8 +56,8 @@ with open('employee.json', encoding='utf-8') as f:
 
 - `l02_pydantic_models/app.py:49` — `user = User.model_validate_json(json_string, strict=False)`
 - `l02_pydantic_models/models.py:176` — `user = User.model_validate_json(json_string, strict=False)`
-- `l02_pydantic_models/app.py:47` *(в закомментированном учебном блоке)* — `# model_validate_json: разбирает СТРОКУ JSON и сразу валидирует её по модели.`
-- `l02_pydantic_models/models.py:171` *(в закомментированном учебном блоке)* — `# model_validate_json — метод КЛАССА: вызывается на User, а не на готовом`
+- `l02_pydantic_models/app.py:47` *(строка-комментарий)* — `# model_validate_json: разбирает СТРОКУ JSON и сразу валидирует её по модели.`
+- `l02_pydantic_models/models.py:171` *(строка-комментарий)* — `# model_validate_json — метод КЛАССА: вызывается на User, а не на готовом`
 
 ## См. также
 

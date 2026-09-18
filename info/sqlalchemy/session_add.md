@@ -55,8 +55,8 @@ session.commit()
 
 - `l04_orm_basics/app_1.py:82` — `session.add(new_user)`
 - `l06_practice/app2.py:77` — `session.add(User(name='admin', age=20))`
-- `l05_orm_relationships/app.py:128` *(в закомментированном учебном блоке)* — `#     session.add(user)`
-- `l05_orm_relationships/app.py:136` *(в закомментированном учебном блоке)* — `#     session.add_all(users)`
+- `l05_orm_relationships/app.py:128` *(строка-комментарий)* — `#     session.add(user)`
+- `l05_orm_relationships/app.py:136` *(строка-комментарий)* — `#     session.add_all(users)`
 
 ## См. также
 

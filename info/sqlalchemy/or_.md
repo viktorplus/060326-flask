@@ -70,7 +70,7 @@ if conditions:
 - `l05_orm_relationships/app.py:246` — `query = select(User).where(or_(User.username.ilike('U%'), User.username.ilike('A%')))`
 - `l05_orm_relationships/app.py:251` — `query = select(User).where(or_(User.age < 20, User.age > 50))`
 - `l05_orm_relationships/app.py:256` — `query = select(User).where(not_(User.age > 40))`
-- `l05_orm_relationships/app.py:244` *(в закомментированном учебном блоке)* — `# or_(...) объединяет условия через OR. Питоновский or здесь использовать НЕЛЬЗЯ —`
+- `l05_orm_relationships/app.py:244` *(строка-комментарий)* — `# or_(...) объединяет условия через OR. Питоновский or здесь использовать НЕЛЬЗЯ —`
 
 ## См. также
 

@@ -42,7 +42,7 @@ mapper_registry.map_imperatively(User, user_table)
 
 ## Где в репозитории
 
-- `l04_orm_basics/app_2.py:18` *(в закомментированном учебном блоке)* — `# mapped_register = registry()`
+- `l04_orm_basics/app_2.py:18` *(строка-комментарий)* — `# mapped_register = registry()`
 
 ## См. также
 

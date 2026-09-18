@@ -58,8 +58,8 @@ session.commit()
 
 - `l04_orm_basics/app_1.py:86` — `session.commit()`
 - `l06_practice/app2.py:78` — `session.commit()`
-- `l05_orm_relationships/app.py:129` *(в закомментированном учебном блоке)* — `#     session.commit()`
-- `l05_orm_relationships/app.py:137` *(в закомментированном учебном блоке)* — `#     session.commit()`
+- `l05_orm_relationships/app.py:129` *(строка-комментарий)* — `#     session.commit()`
+- `l05_orm_relationships/app.py:137` *(строка-комментарий)* — `#     session.commit()`
 
 ## См. также
 

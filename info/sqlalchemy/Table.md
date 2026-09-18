@@ -61,9 +61,9 @@ mapper_registry.map_imperatively(User, user_table)
 
 ## Где в репозитории
 
-- `l04_orm_basics/app_2.py:20` *(в закомментированном учебном блоке)* — `# user_table = Table('users', mapped_register.metadata,`
-- `l04_orm_basics/app_2.py:63` *(в закомментированном учебном блоке)* — `# metadata = MetaData()`
-- `l05_orm_relationships/app.py:94` *(в закомментированном учебном блоке)* — `# tags_association = Table(`
+- `l04_orm_basics/app_2.py:20` *(строка-комментарий)* — `# user_table = Table('users', mapped_register.metadata,`
+- `l04_orm_basics/app_2.py:63` *(строка-комментарий)* — `# metadata = MetaData()`
+- `l05_orm_relationships/app.py:94` *(строка-комментарий)* — `# tags_association = Table(`
 
 ## См. также
 

@@ -43,9 +43,9 @@ query = (select(Address.city, func.count(Address.id).label('cnt'))
 
 ## Где в репозитории
 
-- `l08_orm_loading/app.py:107` *(в закомментированном учебном блоке)* — `#     # .label('addr_count') даёт колонке имя, по которому к ней можно обратиться как row.addr_count`
-- `l08_orm_loading/app.py:108` *(в закомментированном учебном блоке)* — `#     query = select(Address.city, func.count(Address.id).label('addr_count')).group_by(Address.city`
-- `l08_orm_loading/app.py:120` *(в закомментированном учебном блоке)* — `#                    .label('addr_count')).group_by(Address.city).having(func.count(Address.id) > 3)`
+- `l08_orm_loading/app.py:107` *(строка-комментарий)* — `#     # .label('addr_count') даёт колонке имя, по которому к ней можно обратиться как row.addr_count`
+- `l08_orm_loading/app.py:108` *(строка-комментарий)* — `#     query = select(Address.city, func.count(Address.id).label('addr_count')).group_by(Address.city`
+- `l08_orm_loading/app.py:120` *(строка-комментарий)* — `#                    .label('addr_count')).group_by(Address.city).having(func.count(Address.id) > 3)`
 
 ## См. также
 

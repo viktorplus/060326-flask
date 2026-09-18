@@ -71,8 +71,8 @@ for user in session.scalars(query).unique():
 ## Где в репозитории
 
 - `l08_orm_loading/app.py:155` — `query = select(User).join(Address).distinct()`
-- `l08_orm_loading/app.py:149` *(в закомментированном учебном блоке)* — `# .join(Address) — INNER JOIN: в выборку попадут только пользователи,`
-- `l08_orm_loading/app.py:154` *(в закомментированном учебном блоке)* — `# Чтобы join ещё и загружал связь, нужен .options(contains_eager(User.addresses)).`
+- `l08_orm_loading/app.py:149` *(строка-комментарий)* — `# .join(Address) — INNER JOIN: в выборку попадут только пользователи,`
+- `l08_orm_loading/app.py:154` *(строка-комментарий)* — `# Чтобы join ещё и загружал связь, нужен .options(contains_eager(User.addresses)).`
 
 ## См. также
 

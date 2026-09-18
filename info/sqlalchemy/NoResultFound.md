@@ -49,8 +49,8 @@ except NoResultFound:
 
 - `l05_orm_relationships/app.py:24` — `from sqlalchemy.exc import NoResultFound`
 - `l05_orm_relationships/app.py:201` — `except NoResultFound:`
-- `l05_orm_relationships/app.py:23` *(в закомментированном учебном блоке)* — `# NoResultFound — исключение, которым .one() сообщает, что строк не нашлось.`
-- `l05_orm_relationships/app.py:195` *(в закомментированном учебном блоке)* — `# .one() требует ровно одну строку: 0 строк -> NoResultFound, 2+ -> MultipleResultsFound.`
+- `l05_orm_relationships/app.py:23` *(строка-комментарий)* — `# NoResultFound — исключение, которым .one() сообщает, что строк не нашлось.`
+- `l05_orm_relationships/app.py:195` *(строка-комментарий)* — `# .one() требует ровно одну строку: 0 строк -> NoResultFound, 2+ -> MultipleResultsFound.`
 
 ## См. также
 

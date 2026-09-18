@@ -154,6 +154,8 @@ flowchart TB
   с вкладки Actions, создаёт в этом репозитории ветку `teacher/<метка времени UTC>` со снимком
   ветки `main` репозитория преподавателя (`cpython-projects/060326-flask`). К коду уроков
   отношения не имеет — это инструмент архивации.
+  Построчный разбор: [`info/github-actions/`](info/github-actions/README.md); сама задача,
+  которую он решает, — [`info/git/copy-repo-to-branch.md`](info/git/copy-repo-to-branch.md).
 * **`.env.example`** — шаблон файла окружения, лежит в репозитории. После клонирования:
   `cp .env.example .env` (в PowerShell — `Copy-Item .env.example .env`).
 * **`.env`** — `DB_USERNAME` и `DRIVER`, читается только в `l03_rest_api/app.py`.
@@ -164,7 +166,10 @@ flowchart TB
 * **`info/`** — [справочник по библиотекам курса](info/README.md). Разбор каждой функции,
   которая участвует в коде уроков, плюс популярные соседи. По каталогу на пакет:
   [`flask/`](info/flask/README.md) (13 статей), [`pydantic/`](info/pydantic/README.md) (16),
-  [`sqlalchemy/`](info/sqlalchemy/README.md) (39), [`dotenv/`](info/dotenv/README.md) (4).
+  [`sqlalchemy/`](info/sqlalchemy/README.md) (39), [`dotenv/`](info/dotenv/README.md) (4),
+  [`github-actions/`](info/github-actions/README.md) (14) — разбор workflow ниже по директивам,
+  [`git/`](info/git/README.md) (9) — включая
+  [как скопировать репозиторий в отдельную ветку](info/git/copy-repo-to-branch.md).
   В каждой статье есть раздел «Частые ошибки», наполненный теми ошибками, которые реально
   были в этом репозитории, и точные ссылки `файл:строка` на код уроков.
   В каталоге пакета лежит запускаемый `examples.py`; `info/check_refs.py` проверяет,

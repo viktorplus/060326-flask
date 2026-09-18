@@ -64,7 +64,7 @@ select(User).where(func.lower(User.username) == name.lower())
 - `l07_orm_aggregates/app.py:68` — `query = select(func.avg(User.age))`
 - `l07_orm_aggregates/app.py:76` — `query = select(User.username, func.count(User.id)).group_by(User.username)`
 - `l07_orm_aggregates/app.py:90` — `stmt = select(user_aliase.username, func.count(user_aliase.id)).group_by(user_aliase.username)`
-- `l07_orm_aggregates/app.py:8` *(в закомментированном учебном блоке)* — `# func — «мост» к SQL-функциям: func.avg(...), func.count(...), func.max(...).`
+- `l07_orm_aggregates/app.py:8` *(строка-комментарий)* — `# func — «мост» к SQL-функциям: func.avg(...), func.count(...), func.max(...).`
 
 ## См. также
 

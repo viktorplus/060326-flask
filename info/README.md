@@ -11,6 +11,8 @@
 | [`pydantic/`](pydantic/README.md) | `pydantic` | 16 | модели, поля, валидаторы, сериализация |
 | [`sqlalchemy/`](sqlalchemy/README.md) | `SQLAlchemy` | 39 | движок, модели, сессия, запросы, связи |
 | [`dotenv/`](dotenv/README.md) | `python-dotenv` | 4 | чтение и запись `.env` |
+| [`github-actions/`](github-actions/README.md) | GitHub Actions | 14 | разбор `.github/workflows/main.yml` по директивам |
+| [`git/`](git/README.md) | `git` | 9 | команды из workflow + **как скопировать репозиторий в отдельную ветку** |
 
 В корне этого каталога лежат **исходные конспекты с занятий** — они не тронуты:
 
@@ -57,6 +59,15 @@
 | `basicConfig(INFO)` не включает лог SQLAlchemy | `l06_practice`, `l04_orm_basics` | [create_engine](sqlalchemy/create_engine.md) |
 | Наивный `datetime.now()` против даты с поясом | `l06_practice` | [field_validator](pydantic/field_validator.md) |
 
+Для workflow ошибки другого рода — они ломают запуск в CI, а не код на машине:
+
+| Ошибка | Чем оборачивается | Статья |
+|---|---|---|
+| `fetch-depth: 1` по умолчанию | нет истории, половина команд git ведёт себя не так | [actions/checkout](github-actions/actions-checkout.md) |
+| Нет `permissions: contents: write` | `git push` отдаёт 403, похоже на проблему с паролем | [permissions](github-actions/permissions.md) |
+| `${{ inputs.x }}` прямо в тексте `run` | инъекция команд в shell | [выражения](github-actions/expressions.md) |
+| `--force` вместо `--force-with-lease` | чужие коммиты затираются молча | [--force-with-lease](git/force-with-lease.md) |
+
 ## Запускаемые примеры
 
 В каждом каталоге пакета лежит `examples.py` — он выполняется и печатает результат,
@@ -68,9 +79,14 @@ cd info/dotenv     && python examples.py
 cd info/flask      && python examples.py     # без сервера, через app.test_client()
 cd info/pydantic   && python examples.py
 cd info/sqlalchemy && python examples.py     # база в памяти, на диске ничего не создаётся
+cd info/git        && bash examples.sh       # три временных репозитория, настоящие команды git
 ```
 
 Ни один пример не занимает порт, не пишет файлы в репозиторий и не требует `.env`.
+У `github-actions/` своего `examples.py` нет: workflow выполняется на стороне GitHub,
+локально его не запустить. Вместо этого каждая статья ссылается на конкретные строки
+реального файла `.github/workflows/main.yml`, а практическая часть вынесена в
+[git/copy-repo-to-branch.md](git/copy-repo-to-branch.md) — там всё запускается.
 
 ## Проверка ссылок на код
 

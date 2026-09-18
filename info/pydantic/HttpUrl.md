@@ -41,8 +41,8 @@ example.com https
 
 - `l02_pydantic_models/models.py:13` — `from pydantic import BaseModel, EmailStr, ValidationError, Field, HttpUrl, field_validator, ConfigDi`
 - `l02_pydantic_models/models.py:43` — `url: HttpUrl`
-- `l02_pydantic_models/models.py:10` *(в закомментированном учебном блоке)* — `# HttpUrl        — тип-валидатор http/https-ссылки.`
-- `l02_pydantic_models/models.py:42` *(в закомментированном учебном блоке)* — `# HttpUrl отвергнет строку, которая не является корректным http(s)-адресом.`
+- `l02_pydantic_models/models.py:10` *(строка-комментарий)* — `# HttpUrl        — тип-валидатор http/https-ссылки.`
+- `l02_pydantic_models/models.py:42` *(строка-комментарий)* — `# HttpUrl отвергнет строку, которая не является корректным http(s)-адресом.`
 
 ## См. также
 

@@ -79,7 +79,7 @@ addresses: Mapped[list['Address']] = relationship(lazy='raise')
 - `l05_orm_relationships/app.py:77` — `user: Mapped['User'] = relationship(back_populates='addresses', lazy='joined')`
 - `l07_orm_aggregates/app.py:56` — `user: Mapped['User'] = relationship(back_populates='addresses', lazy='joined')`
 - `l08_orm_loading/app.py:30` — `addresses: Mapped[list['Address']] = relationship(back_populates='user', lazy='selectin') # 1: M`
-- `l05_orm_relationships/app.py:74` *(в закомментированном учебном блоке)* — `# Обратная сторона связи. lazy='joined' — стратегия загрузки:`
+- `l05_orm_relationships/app.py:74` *(строка-комментарий)* — `# Обратная сторона связи. lazy='joined' — стратегия загрузки:`
 
 ## См. также
 

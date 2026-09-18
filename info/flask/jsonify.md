@@ -60,8 +60,8 @@ except ValidationError as e:
 
 - `l02_pydantic_models/app.py:6` — `from flask import Flask, jsonify, Response`
 - `l02_pydantic_models/app.py:90` — `return jsonify(e.errors(include_url=False, include_context=False)), 400`
-- `l02_pydantic_models/app.py:4` *(в закомментированном учебном блоке)* — `# jsonify      — превращает dict/list в готовый Response с mimetype application/json.`
-- `l02_pydantic_models/app.py:64` *(в закомментированном учебном блоке)* — `# Отдаём готовую строку как JSON-ответ. jsonify здесь не подходит:`
+- `l02_pydantic_models/app.py:4` *(строка-комментарий)* — `# jsonify      — превращает dict/list в готовый Response с mimetype application/json.`
+- `l02_pydantic_models/app.py:64` *(строка-комментарий)* — `# Отдаём готовую строку как JSON-ответ. jsonify здесь не подходит:`
 
 ## См. также
 

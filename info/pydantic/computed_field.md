@@ -73,7 +73,7 @@ def actual_salary(self) -> float:
 - `l03_rest_api/schemas.py:20` — `computed_field,   # свойство, попадающее в сериализованный вывод`
 - `l03_rest_api/schemas.py:75` — `@computed_field`
 - `l03_rest_api/schemas.py:82` — `@computed_field`
-- `l03_rest_api/schemas.py:72` *(в закомментированном учебном блоке)* — `# @computed_field включает это свойство в model_dump()/model_dump_json(),`
+- `l03_rest_api/schemas.py:72` *(строка-комментарий)* — `# @computed_field включает это свойство в model_dump()/model_dump_json(),`
 
 ## См. также
 

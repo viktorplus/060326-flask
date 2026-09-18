@@ -54,9 +54,9 @@ if user:
 ## Где в репозитории
 
 - `l05_orm_relationships/app.py:206` — `user_one_get = session.get(User, 100000)`
-- `l05_orm_relationships/app.py:141` *(в закомментированном учебном блоке)* — `#     user = session.get(User, 1)     # выборка по первичному ключу`
-- `l05_orm_relationships/app.py:161` *(в закомментированном учебном блоке)* — `#     user = session.get(User, 1)`
-- `l05_orm_relationships/app.py:204` *(в закомментированном учебном блоке)* — `# session.get ищет по первичному ключу и возвращает None, если записи нет`
+- `l05_orm_relationships/app.py:141` *(строка-комментарий)* — `#     user = session.get(User, 1)     # выборка по первичному ключу`
+- `l05_orm_relationships/app.py:161` *(строка-комментарий)* — `#     user = session.get(User, 1)`
+- `l05_orm_relationships/app.py:204` *(строка-комментарий)* — `# session.get ищет по первичному ключу и возвращает None, если записи нет`
 
 ## См. также
 

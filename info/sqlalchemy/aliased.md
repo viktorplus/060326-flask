@@ -61,7 +61,7 @@ query = select(User.username, manager.username).join(manager, User.manager_id ==
 
 - `l07_orm_aggregates/app.py:12` — `from sqlalchemy.orm import aliased`
 - `l07_orm_aggregates/app.py:86` — `user_aliase = aliased(User, name='user_aliase')`
-- `l07_orm_aggregates/app.py:11` *(в закомментированном учебном блоке)* — `# aliased — псевдоним таблицы (SQL AS), нужен для самосоединений и читаемости запроса.`
+- `l07_orm_aggregates/app.py:11` *(строка-комментарий)* — `# aliased — псевдоним таблицы (SQL AS), нужен для самосоединений и читаемости запроса.`
 
 ## См. также
 
