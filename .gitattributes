@@ -1,0 +1,18 @@
+# Shell-скрипты обязаны сохранять окончания строк LF в рабочем каталоге.
+#
+# Обычная для Windows настройка core.autocrlf=true при выгрузке из git
+# заменяет LF на CRLF. У shell-скрипта, выгруженного так, в конце строки
+# с shebang оказывается символ CR, и на Linux или macOS запуск ./script.sh
+# падает с ошибкой:
+#     bad interpreter: /usr/bin/env bash^M: no such file or directory
+#
+# Правило ниже закрепляет за *.sh окончания LF независимо от платформы
+# и от значения core.autocrlf.
+#
+# Проверить, что правило применилось:
+#     git check-attr -a info/git/examples.sh
+#     git ls-files --eol info/git/examples.sh      -> w/lf
+#
+# В репозитории под это правило попадает info/git/examples.sh —
+# запускаемая демонстрация к справочнику по git.
+*.sh text eol=lf
