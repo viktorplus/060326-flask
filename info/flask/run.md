@@ -60,6 +60,7 @@ python -m flask --app app run --debug --port 5001
 - `l01_routing/app.py:68` — `app.run()`
 - `l02_pydantic_models/app.py:128` — `app.run(debug=True)`
 - `l03_rest_api/app.py:120` — `app.run(debug=True)`
+- `p01_routing_practice/app.py:68` — `app.run()`
 
 ## См. также
 

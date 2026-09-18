@@ -69,7 +69,7 @@ simple = {'.'.join(map(str, err['loc'])): err['msg']
 - `l02_pydantic_models/app.py:90` — `return jsonify(e.errors(include_url=False, include_context=False)), 400`
 - `l03_rest_api/app.py:58` — `error = ErrorResponse(error="Validation error", details=e.errors(include_url=False, include_context=`
 - `l06_practice/app.py:161` — `print(f'ValidationError (ожидаемо, дата в прошлом): {e.errors()[0]["msg"]}')`
-- `l02_pydantic_models/app.py:82` *(строка-комментарий)* — `# return jsonify(e.errors())`
+- `p02_pydantic_classwork/app.py:67` — `return jsonify(e.errors(include_url=False, include_context=False)), 400`
 
 ## См. также
 

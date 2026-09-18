@@ -70,6 +70,7 @@ if not token:
 - `l03_rest_api/app.py:67` — `if request.method == "POST":`
 - `l03_rest_api/app.py:72` — `employee = Employee(**request.get_json(force=True))`
 - `l03_rest_api/app.py:103` — `new_employees = EmployeeListAdapter.validate_python(request.get_json(force=True))`
+- `p03_rest_api_classwork/app.py:92` — `data = request.get_json(force=True)  # получаем данные из запроса в виде словаря`
 
 ## См. также
 

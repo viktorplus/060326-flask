@@ -3,6 +3,8 @@
 Разбор каждой функции, которая участвует в коде этого репозитория, плюс популярные соседи,
 которых в уроках нет, но которые понадобятся дальше.
 
+Ссылки «Где в репозитории» охватывают обе серии каталогов: уроки `l…` и практику `p…`.
+
 ## Что где лежит
 
 | Каталог | Пакет | Статей | Что внутри |
@@ -57,7 +59,12 @@
 | Валидатор объявлен вне тела класса | `l06_practice` | [field_validator](pydantic/field_validator.md) |
 | Валидатор без `return value` | `l06_practice` | [field_validator](pydantic/field_validator.md) |
 | `basicConfig(INFO)` не включает лог SQLAlchemy | `l06_practice`, `l04_orm_basics` | [create_engine](sqlalchemy/create_engine.md) |
-| Наивный `datetime.now()` против даты с поясом | `l06_practice` | [field_validator](pydantic/field_validator.md) |
+| Наивный `datetime.now()` против даты с поясом | `l06_practice`, `p06_pydantic_tasks` | [field_validator](pydantic/field_validator.md) |
+| Обработчик с телом `pass` — маршрут отдаёт 500 | `p03_rest_api_classwork` | [Response](flask/Response.md) |
+| Импорт по старому имени каталога после переименования | `p02_pydantic_classwork` | [BaseModel](pydantic/BaseModel.md) |
+| Обращение к полям объекта после `delete` + `commit` | `l09_orm_practice` | [session.commit](sqlalchemy/session_commit.md) |
+| Проверка результата стояла вне `if` и работала по `None` | `l09_orm_practice` | [first / one / all](sqlalchemy/first_one_all.md) |
+| Опечатка в имени поля модели (`patern_name`) | `p06_pydantic_tasks` | [Field](pydantic/Field.md) |
 
 Для workflow ошибки другого рода — они ломают запуск в CI, а не код на машине:
 
