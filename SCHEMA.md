@@ -161,9 +161,17 @@ flowchart TB
   Ключ называется `DB_USERNAME`, а не `USERNAME`, намеренно: `USERNAME` на Windows занят
   системой, а `load_dotenv()` по умолчанию не перезаписывает уже существующие переменные,
   так что значение из `.env` было бы молча проигнорировано.
-* **`info/`** — короткие конспекты по темам курса: `SQLAlchemy.md`, `computed_field.md`,
+* **`info/`** — [справочник по библиотекам курса](info/README.md). Разбор каждой функции,
+  которая участвует в коде уроков, плюс популярные соседи. По каталогу на пакет:
+  [`flask/`](info/flask/README.md) (13 статей), [`pydantic/`](info/pydantic/README.md) (16),
+  [`sqlalchemy/`](info/sqlalchemy/README.md) (39), [`dotenv/`](info/dotenv/README.md) (4).
+  В каждой статье есть раздел «Частые ошибки», наполненный теми ошибками, которые реально
+  были в этом репозитории, и точные ссылки `файл:строка` на код уроков.
+  В каталоге пакета лежит запускаемый `examples.py`; `info/check_refs.py` проверяет,
+  что ссылки на код не разошлись с самим кодом.
+  В корне `info/` остались исходные конспекты с занятий: `SQLAlchemy.md`, `computed_field.md`,
   `type_adapter.md`, `model_dump__model_validate`, `mapping`, `responce.md`,
-  `default_factory.md`, `run-install.txt` (установка зависимостей и способы запуска Flask).
+  `default_factory.md`, `run-install.txt`.
 * **`.idea/`** — настройки PyCharm, в том числе подключённые источники данных.
 
 ## Как смотреть эти схемы
