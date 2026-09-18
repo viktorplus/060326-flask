@@ -353,3 +353,6 @@ pyrightconfig.json
 # app_2.py -> db.sqlite). В репозитории их быть не должно — в отличие от готовых
 # db.sqlite в l05/l07/l08, которые лежат в git специально, с данными для запросов.
 l04_orm_basics/db.sqlite
+# p09_orm_homework создаёт shop.db при запуске — это схема без данных,
+# держать её в git незачем.
+p09_orm_homework/shop.db

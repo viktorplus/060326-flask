@@ -61,7 +61,7 @@
 | [`sessionmaker`](sessionmaker.md) | Фабрика сессий, привязанная к движку. | `l04_orm_basics/app_1.py:14`<br>`l04_orm_basics/app_1.py:66` |
 | [`session.add`](session_add.md) | Помечает объект как новый в сессии. | `l04_orm_basics/app_1.py:82`<br>`l06_practice/app2.py:77` |
 | [`session.commit`](session_commit.md) | `commit()` отправляет накопленные изменения в базу и фиксирует транзакцию. | `l04_orm_basics/app_1.py:86`<br>`l06_practice/app2.py:78` |
-| [`session.get`](session_get.md) | Находит объект по первичному ключу. | `l05_orm_relationships/app.py:206`<br>`l09_orm_practice/app.py:104` |
+| [`session.get`](session_get.md) | Находит объект по первичному ключу. | `l05_orm_relationships/app.py:206`<br>`l09_orm_practice/app.py:110` |
 | [`session.scalars`](session_scalars.md) | Выполняет запрос и возвращает ПЕРВУЮ КОЛОНКУ каждой строки. | `l05_orm_relationships/app.py:187`<br>`l05_orm_relationships/app.py:199` |
 | [`session.execute`](session_execute.md) | Выполняет запрос и возвращает строки целиком — объекты `Row`, похожие на именованные кортежи. | `l07_orm_aggregates/app.py:79`<br>`l07_orm_aggregates/app.py:91` |
 | [`session.scalar`](session_scalar.md) | Выполняет запрос и возвращает ОДНО значение — первую колонку первой строки. | `l05_orm_relationships/app.py:187`<br>`l05_orm_relationships/app.py:199` |
@@ -96,6 +96,25 @@
 | [`.label()`](label.md) | Даёт имя вычисляемой колонке — это SQL-конструкция `AS`. | `l08_orm_loading/app.py:107`<br>`l08_orm_loading/app.py:108` |
 | [`aliased`](aliased.md) | Псевдоним таблицы — SQL-конструкция `AS`. | `l07_orm_aggregates/app.py:12`<br>`l07_orm_aggregates/app.py:86` |
 | [`scalar_subquery`](scalar_subquery.md) | Превращает запрос в подзапрос, возвращающий ОДНО значение, — его можно подставить прямо в условие. | `l08_orm_loading/app.py:125`<br>`l08_orm_loading/app.py:127` |
+
+### Сложные запросы
+
+| Символ | О чём | Где в коде уроков |
+|---|---|---|
+| [`exists / any / has`](exists.md) | Условие «существует хотя бы одна связанная строка». | — |
+| [`case`](case.md) | Условное выражение внутри запроса — SQL-конструкция `CASE WHEN . | — |
+| [`subquery`](subquery.md) | Превращает запрос в подзапрос, к которому можно присоединиться как к таблице. | — |
+| [`cte`](cte.md) | Обобщённое табличное выражение — SQL `WITH имя AS (. | — |
+| [`union / union_all`](union.md) | Объединение результатов нескольких запросов в один набор строк. | — |
+| [`over — оконные функции`](over.md) | Оконная функция: считает агрегат, **не схлопывая строки**. | — |
+
+### Постранично и массово
+
+| Символ | О чём | Где в коде уроков |
+|---|---|---|
+| [`.limit() / .offset()`](limit_offset.md) | Ограничение количества строк и пропуск первых N. | `l09_orm_practice/app.py:128`<br>`l09_orm_practice/app.py:138` |
+| [`update() / delete() — массовые`](bulk_update_delete.md) | Изменение и удаление строк ОДНИМ запросом, без загрузки объектов в память. | — |
+| [`session.delete`](session_delete.md) | Помечает объект на удаление. | `l09_orm_practice/app.py:101`<br>`l09_orm_practice/app.py:94` |
 
 ### Загрузка связей
 

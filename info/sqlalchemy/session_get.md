@@ -54,8 +54,8 @@ if user:
 ## Где в репозитории
 
 - `l05_orm_relationships/app.py:206` — `user_one_get = session.get(User, 100000)`
-- `l09_orm_practice/app.py:104` — `if session.get(User, deleted_id):`
-- `l09_orm_practice/app.py:144` — `user_to_update = session.get(User, user_id_to_update)`
+- `l09_orm_practice/app.py:110` — `if session.get(User, deleted_id):`
+- `l09_orm_practice/app.py:150` — `user_to_update = session.get(User, user_id_to_update)`
 - `l05_orm_relationships/app.py:141` *(строка-комментарий)* — `#     user = session.get(User, 1)     # выборка по первичному ключу`
 
 ## См. также

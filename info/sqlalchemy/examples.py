@@ -12,12 +12,19 @@ import logging
 from sqlalchemy import (
     ForeignKey,
     String,
+    case,
     create_engine,
+    delete,
     desc,
     func,
+    intersect,
+    literal,
     not_,
     or_,
     select,
+    union,
+    union_all,
+    update,
 )
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import (
@@ -314,5 +321,246 @@ with Session() as s:
     print("  после flush() : id =", u.id, "(INSERT ушёл, транзакция ещё открыта)")
     s.commit()
     print("  после commit(): id =", u.id, "(зафиксировано)")
+
+# ===========================================================================
+# Сложные запросы. Дальше — не отдельные конструкции, а задачи, которые
+# реально приходится решать, и то, как они выражаются в ORM.
+# ===========================================================================
+
+title(14, "exists: у кого есть адреса, а у кого нет")
+
+with Session() as s:
+    with_addr = select(User).where(User.addresses.any())
+    without = select(User).where(~User.addresses.any())
+    print("  с адресами :", [u.name for u in s.scalars(with_addr)])
+    print("  без адресов:", [u.name for u in s.scalars(without)])
+    print("  с адресом в Berlin:",
+          [u.name for u in s.scalars(select(User).where(User.addresses.any(Address.city == "Berlin")))])
+
+    print("\n  Почему не join: он вернёт Alice дважды, у неё два адреса.")
+    print("    join           ->", [u.name for u in s.scalars(select(User).join(Address))])
+    print("    any() (EXISTS) ->", [u.name for u in s.scalars(with_addr)])
+    print("  EXISTS останавливается на первом совпадении и дубликатов не даёт.")
+
+    print("\n  ЛОВУШКА: питоновский not вместо ~")
+    try:
+        select(User).where(not User.addresses.any())
+    except TypeError as e:
+        print("   ", e)
+
+# ---------------------------------------------------------------------------
+title(15, "case: разложить пользователей по возрастным группам")
+
+with Session() as s:
+    group = case(
+        (User.age < 18, "ребёнок"),
+        (User.age < 30, "молодой"),
+        else_="взрослый",
+    )
+    rows = s.execute(select(User.name, group.label("группа")).order_by(User.name)).all()
+    for name, g in rows:
+        print(f"    {name:8} {g}")
+
+    print("\n  Сколько человек в каждой группе — тем же выражением в group_by:")
+    for g, n in s.execute(select(group.label("g"), func.count(User.id)).group_by(group)):
+        print(f"    {g:10} {n}")
+
+    print("\n  Условная сумма: сколько адресов в NY и сколько в остальных городах")
+    ny, other = s.execute(select(
+        func.sum(case((Address.city == "New York", 1), else_=0)).label("ny"),
+        func.sum(case((Address.city != "New York", 1), else_=0)).label("other"),
+    )).one()
+    print(f"    NY: {ny}, остальные: {other}")
+
+# ---------------------------------------------------------------------------
+title(16, "subquery + join: топ пользователей по числу адресов")
+
+with Session() as s:
+    counts = (select(Address.user_id, func.count(Address.id).label("n"))
+              .group_by(Address.user_id)
+              .subquery())
+
+    rows = s.execute(
+        select(User.name, counts.c.n)
+        .join(counts, User.id == counts.c.user_id)
+        .order_by(counts.c.n.desc(), User.name)
+    ).all()
+    for name, n in rows:
+        print(f"    {name:8} {n}")
+
+    print("\n  Колонки подзапроса доступны ТОЛЬКО через .c —", "counts.c.n =", counts.c.n)
+
+    print("\n  aliased(Model, subq) возвращает объекты, а не кортежи:")
+    adults = aliased(User, select(User).where(User.age > 25).subquery())
+    print("   ", [u.name for u in s.scalars(select(adults))])
+
+# ---------------------------------------------------------------------------
+title(17, "cte: именованный промежуточный набор и рекурсия")
+
+with Session() as s:
+    by_city = (select(Address.city, func.count(Address.id).label("n"))
+               .group_by(Address.city)
+               .cte("by_city"))
+    print("  города, где больше одного адреса:")
+    for city, n in s.execute(select(by_city.c.city, by_city.c.n).where(by_city.c.n > 1)):
+        print(f"    {city:14} {n}")
+
+    print("\n  Рекурсивный CTE — последовательность 1..5 без таблицы вообще:")
+    base = select(literal(1).label("n")).cte("seq", recursive=True)
+    seq = base.union_all(select(base.c.n + 1).where(base.c.n < 5))
+    print("   ", s.execute(select(seq.c.n)).scalars().all())
+    print("  Так же обходят деревья: категории, подчинённых, ветки комментариев.")
+    print("  Без условия остановки (n < 5) запрос зациклится.")
+
+# ---------------------------------------------------------------------------
+title(18, "union / intersect: собрать несовместимые выборки в одну")
+
+with Session() as s:
+    young = select(User.name).where(User.age < 25)
+    old = select(User.name).where(User.age > 40)
+
+    print("  младше 25 ИЛИ старше 40:")
+    print("   ", s.execute(union(young, old)).scalars().all())
+
+    print("\n  union убирает дубликаты, union_all — нет:")
+    print("    union(young, young)     ->", s.execute(union(young, young)).scalars().all())
+    print("    union_all(young, young) ->", s.execute(union_all(young, young)).scalars().all())
+    print("  union_all быстрее: базе не нужно сравнивать весь результат.")
+
+    print("\n  intersect — кому ровно 30 И у кого есть адрес:")
+    a30 = select(User.name).where(User.age == 30)
+    withaddr = select(User.name).join(Address)
+    print("   ", s.execute(intersect(a30, withaddr)).scalars().all())
+
+# ---------------------------------------------------------------------------
+title(19, "over: ранг внутри города, не схлопывая строки")
+
+with Session() as s:
+    rank = func.row_number().over(partition_by=Address.city, order_by=User.age.desc())
+    print("  кто самый старший в каждом городе:")
+    for city, name, age, r in s.execute(
+        select(Address.city, User.name, User.age, rank.label("rank"))
+        .join(User).order_by(Address.city, "rank")
+    ):
+        mark = "  <- первый" if r == 1 else ""
+        print(f"    {city:14} {name:8} {age:3}  #{r}{mark}")
+
+    print("\n  Отличие от group_by: строки остались на месте, добавилась колонка.")
+    print("  Общее число рядом с каждой строкой — окно без partition_by:")
+    for name, total in s.execute(select(User.name, func.count().over().label("total")).limit(3)):
+        print(f"    {name:8} всего в выборке: {total}")
+
+    print("\n  ЛОВУШКА: по окну нельзя фильтровать в WHERE — оно считается ПОСЛЕ.")
+    print("  Нужен подзапрос: берём только тех, у кого rank = 1.")
+    sub = select(Address.city, User.name, rank.label("rn")).join(User).subquery()
+    print("   ", s.execute(select(sub.c.city, sub.c.name).where(sub.c.rn == 1)).all())
+
+# ---------------------------------------------------------------------------
+title(20, "limit / offset: постраничная выдача и её ловушка")
+
+with Session() as s:
+    total = s.scalar(select(func.count()).select_from(User))
+    print(f"  всего пользователей: {total}")
+
+    per_page = 2
+    for page in (1, 2):
+        q = select(User).order_by(User.id).limit(per_page).offset((page - 1) * per_page)
+        print(f"    страница {page}: {[u.name for u in s.scalars(q)]}")
+
+    print("\n  ЛОВУШКА: limit без order_by. Порядок строк не гарантирован вообще,")
+    print("  и «первые два» на другой СУБД или после вставок окажутся другими.")
+    print("    limit(2) без сортировки ->", [u.name for u in s.scalars(select(User).limit(2))])
+
+    print("\n  Большой offset дорог: база вычитывает и выбрасывает всё, что пропускает.")
+    print("  Для глубокой постраничности берут курсор по ключу:")
+    last_id = 2
+    q = select(User).where(User.id > last_id).order_by(User.id).limit(per_page)
+    print("    после id=2 ->", [u.name for u in s.scalars(q)])
+
+# ---------------------------------------------------------------------------
+title(21, "bulk update / delete: одним запросом, без загрузки объектов")
+
+with Session() as s:
+    res = s.execute(update(User).where(User.age < 18).values(age=18))
+    print(f"  update(age<18 -> 18): затронуто строк = {res.rowcount}")
+    s.rollback()
+
+    res = s.execute(delete(Address).where(Address.city == "Berlin"))
+    print(f"  delete(city='Berlin'): затронуто строк = {res.rowcount}")
+    s.rollback()
+    print("  (оба отката сделаны, данные на месте)")
+
+    print("\n  ГЛАВНОЕ ОТЛИЧИЕ от session.delete: каскады ORM НЕ срабатывают.")
+    print("  delete(User) массовой формой оставит адреса с несуществующим user_id,")
+    print("  даже если в relationship прописан cascade='all, delete-orphan'.")
+    print("  Нужен каскад — либо session.delete(объект), либо ondelete='CASCADE' в базе.")
+
+# ---------------------------------------------------------------------------
+title(22, "session.delete: что делает каскад — и чего НЕ делает")
+
+with Session() as s:
+    alice = s.scalar(select(User).where(User.name == "Alice"))
+    print(f"  у Alice адресов: {len(alice.addresses)}")
+    print("  В этой модели relationship объявлен БЕЗ cascade. Удаляем родителя:")
+    s.delete(alice)
+    try:
+        s.commit()
+        print("    удалилось без ошибки")
+    except IntegrityError as e:
+        s.rollback()
+        print(f"    IntegrityError: {str(e.orig)}")
+        print("    ушедший SQL:  UPDATE addresses SET user_id=NULL WHERE addresses.id = ?")
+        print()
+        print("  ВОТ ЧТО ПРОИСХОДИТ. Каскад по умолчанию ('save-update, merge') при удалении")
+        print("  родителя не удаляет детей, а ОТВЯЗЫВАЕТ их: ставит внешний ключ в NULL.")
+        print("  Колонка user_id объявлена как NOT NULL — отсюда ошибка.")
+        print("  Будь колонка nullable, ошибки бы не было, и в базе остались бы")
+        print("  осиротевшие адреса без пользователя. Это хуже: ломается тихо.")
+
+
+# Отдельная маленькая схема — показать, как это должно быть
+class B2(DeclarativeBase):
+    pass
+
+
+class Parent(B2):
+    __tablename__ = "parent"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(20))
+    children: Mapped[list["Child"]] = relationship(
+        back_populates="parent", cascade="all, delete-orphan")
+
+
+class Child(B2):
+    __tablename__ = "child"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    parent_id: Mapped[int] = mapped_column(ForeignKey("parent.id"))
+    parent: Mapped["Parent"] = relationship(back_populates="children")
+
+
+e2 = create_engine("sqlite:///:memory:")
+B2.metadata.create_all(e2)
+S2 = sessionmaker(bind=e2)
+with S2() as s:
+    s.add(Parent(name="P", children=[Child(), Child(), Child()]))
+    s.commit()
+
+print()
+print("  Та же операция, но с cascade='all, delete-orphan':")
+with S2() as s:
+    before = s.scalar(select(func.count()).select_from(Child))
+    p = s.scalar(select(Parent))
+    s.delete(p)
+    s.commit()
+    after = s.scalar(select(func.count()).select_from(Child))
+    print(f"    детей в базе: {before} -> {after}  — ушли вместе с родителем")
+
+    print()
+    print("  Распространённое заблуждение: «после удаления объект трогать нельзя».")
+    print(f"    p.id   -> {p.id}")
+    print(f"    p.name -> {p.name}")
+    print("  Читается без ошибки. Объект перешёл в detached, но уже загруженные значения")
+    print("  остались при нём. DetachedInstanceError будет только при обращении к полю,")
+    print("  которого в объекте нет: перечитать его неоткуда.")
 
 print("\nГотово. База была в памяти — на диске ничего не осталось.")

@@ -89,8 +89,14 @@ with Session() as session:
     query = select(User).where(User.name == user_name)
     user_to_delete = session.scalar(query)
     if user_to_delete:
-        # id нужно запомнить ДО удаления: после session.delete + commit объект
-        # открепляется от сессии, и обращение к его полям даст DetachedInstanceError.
+        # id запоминаем ДО удаления — так надёжнее и понятнее читается.
+        # ТОЧНОЕ ПОВЕДЕНИЕ (проверено запуском, вопреки распространённому мнению):
+        # после session.delete + commit объект переходит в состояние detached,
+        # но уже загруженные значения остаются в нём и читаются БЕЗ ошибки —
+        # и user_to_delete.id, и user_to_delete.name после удаления доступны.
+        # DetachedInstanceError возникнет только при обращении к полю, которого
+        # в объекте нет: оно было обесценено (expired) и перечитать его неоткуда,
+        # потому что объект больше не привязан к сессии.
         deleted_id = user_to_delete.id
         session.delete(user_to_delete)
         session.commit()

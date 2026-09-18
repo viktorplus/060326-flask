@@ -45,6 +45,7 @@
 | `p02_pydantic_classwork` | `l02_pydantic_models` | своё решение того же занятия | Flask + Pydantic | `cd p02_pydantic_classwork && python app.py` | [SCHEMA](p02_pydantic_classwork/SCHEMA.md) |
 | `p03_rest_api_classwork` | `l03_rest_api` | тот же REST API, но **одним файлом** | Flask + Pydantic | `cd p03_rest_api_classwork && python app.py` | [SCHEMA](p03_rest_api_classwork/SCHEMA.md) |
 | `p06_pydantic_tasks` | `l06_practice` | те же 4 задания, второе решение | Pydantic | `cd p06_pydantic_tasks && python app.py` | [SCHEMA](p06_pydantic_tasks/SCHEMA.md) |
+| `p09_orm_homework` | `l09_orm_practice` | домашняя работа: схема магазина, `Numeric` для денег | SQLAlchemy | `cd p09_orm_homework && python app.py` | [SCHEMA](p09_orm_homework/SCHEMA.md) |
 
 Flask есть только в первых трёх уроках и в практике `p01`–`p03`. Начиная с 08.09 занятия
 про базу данных, и веб-слоя в них нет вообще — это обычные скрипты, которые выполняются
@@ -148,6 +149,7 @@ flowchart TB
 | `p02_pydantic_classwork` | путь URL; JSON для `/` зашит в код | `application/json` + `text/html`, коды `200/400` |
 | `p03_rest_api_classwork` | тело HTTP-запроса (JSON) | `application/json`, коды `200/201/400`; запись в `employees.json` |
 | `p06_pydantic_tasks` | значения зашиты в код | stdout |
+| `p09_orm_homework` | ничего | создаёт `shop.db` (схема без данных), вывода нет |
 
 Данные извне принимает **только `l03_rest_api`**. У остальных вход зашит в исходник либо
 лежит в файле БД рядом.
@@ -169,6 +171,7 @@ flowchart TB
 | `l05_orm_relationships`, `l07_orm_aggregates`, `l08_orm_loading` | подключится пустая новая `db.sqlite` в корне вместо готовой, все выборки вернут пусто |
 | `l09_orm_practice` | то же с `practicum3.db`: пустая база в корне вместо готовой |
 | `l04_orm_basics` | `db.sqlite3` и `db.sqlite` появятся в корне репозитория |
+| `p09_orm_homework` | `shop.db` появится в корне репозитория |
 | `p02_pydantic_classwork` | `from models import User` — ModuleNotFoundError |
 | `p03_rest_api_classwork` | `employees.json` создастся в корне |
 | `l01_routing`, `l06_practice`, `p01_routing_practice`, `p06_pydantic_tasks` | ничего — файлов данных они не читают, но правило всё равно общее |

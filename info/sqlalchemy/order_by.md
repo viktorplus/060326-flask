@@ -53,7 +53,7 @@ select(User).order_by(User.nickname.desc().nullslast())
 - `l05_orm_relationships/app.py:261` — `query = select(User).order_by(User.age)`
 - `l05_orm_relationships/app.py:266` — `query = select(User).order_by(desc(User.age))`
 - `l05_orm_relationships/app.py:272` — `query = select(User).order_by(desc(User.age), User.username)`
-- `l09_orm_practice/app.py:115` — `query = select(User).order_by(User.age.desc())`
+- `l09_orm_practice/app.py:121` — `query = select(User).order_by(User.age.desc())`
 
 ## См. также
 

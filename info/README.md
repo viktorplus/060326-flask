@@ -11,7 +11,7 @@
 |---|---|---|---|
 | [`flask/`](flask/README.md) | `flask` | 13 | приложение, маршруты, запрос, ответ, ошибки |
 | [`pydantic/`](pydantic/README.md) | `pydantic` | 16 | модели, поля, валидаторы, сериализация |
-| [`sqlalchemy/`](sqlalchemy/README.md) | `SQLAlchemy` | 39 | движок, модели, сессия, запросы, связи |
+| [`sqlalchemy/`](sqlalchemy/README.md) | `SQLAlchemy` | 48 | движок, модели, сессия, запросы, связи, **сложные запросы** |
 | [`dotenv/`](dotenv/README.md) | `python-dotenv` | 4 | чтение и запись `.env` |
 | [`github-actions/`](github-actions/README.md) | GitHub Actions | 14 | разбор `.github/workflows/main.yml` по директивам |
 | [`git/`](git/README.md) | `git` | 9 | команды из workflow + **как скопировать репозиторий в отдельную ветку** |
@@ -65,6 +65,11 @@
 | Обращение к полям объекта после `delete` + `commit` | `l09_orm_practice` | [session.commit](sqlalchemy/session_commit.md) |
 | Проверка результата стояла вне `if` и работала по `None` | `l09_orm_practice` | [first / one / all](sqlalchemy/first_one_all.md) |
 | Опечатка в имени поля модели (`patern_name`) | `p06_pydantic_tasks` | [Field](pydantic/Field.md) |
+| `limit` без `order_by` — «первые N» не те | — | [limit / offset](sqlalchemy/limit_offset.md) |
+| Фильтр по оконной функции в `WHERE` | — | [over](sqlalchemy/over.md) |
+| Массовый `delete()` не запускает каскады ORM | — | [update / delete](sqlalchemy/bulk_update_delete.md) |
+| Каскад по умолчанию не удаляет детей, а ставит FK в `NULL` | — | [session.delete](sqlalchemy/session_delete.md) |
+| `lazy='joined'` по коллекции требует `.unique()` | `p09_orm_homework` | [lazy](sqlalchemy/lazy.md) |
 
 Для workflow ошибки другого рода — они ломают запуск в CI, а не код на машине:
 
